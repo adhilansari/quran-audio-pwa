@@ -1,19 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Surah } from '@/types';
 import surahsData from '@/data/surahs.json';
 import { Navbar } from '@/components/Navbar';
 import { BottomNav, NavTab } from '@/components/BottomNav';
 import { MiniPlayer } from '@/components/MiniPlayer';
 import { FullPlayer } from '@/components/FullPlayer';
-import { HomeView } from '@/views/HomeView';
-import { SurahListView } from '@/views/SurahListView';
-import { ReaderView } from '@/views/ReaderView';
-import { DownloadsView } from '@/views/DownloadsView';
-import { BookmarksView } from '@/views/BookmarksView';
-import { SettingsView } from '@/views/SettingsView';
 import { useAudio } from '@/contexts/AudioContext';
 import { downloadManager } from '@/services/downloader';
-import { AlertCircle, X, RefreshCw } from 'lucide-react';
+import { AlertCircle, X, Loader2 } from 'lucide-react';
+
+// Code-split / lazy load all views for optimal initial bundle & fast TTI
+const HomeView = lazy(() => import('@/views/HomeView').then(m => ({ default: m.HomeView })));
+const SurahListView = lazy(() => import('@/views/SurahListView').then(m => ({ default: m.SurahListView })));
+const ReaderView = lazy(() => import('@/views/ReaderView').then(m => ({ default: m.ReaderView })));
+const DownloadsView = lazy(() => import('@/views/DownloadsView').then(m => ({ default: m.DownloadsView })));
+const BookmarksView = lazy(() => import('@/views/BookmarksView').then(m => ({ default: m.BookmarksView })));
+const SettingsView = lazy(() => import('@/views/SettingsView').then(m => ({ default: m.SettingsView })));
+
+const PageLoader = () => (
+  <div className="flex flex-col items-center justify-center min-h-[50vh] text-stone-500 animate-in fade-in duration-200">
+    <div className="w-9 h-9 rounded-full border-3 border-emerald-700/30 border-t-amber-400 animate-spin mb-3 shadow-sm" />
+    <span className="text-xs font-semibold text-emerald-800 dark:text-amber-400">ലോഡിംഗ്...</span>
+  </div>
+);
 
 export const App: React.FC = () => {
   const surahs = surahsData as Surah[];
@@ -25,11 +34,8 @@ export const App: React.FC = () => {
 
   // Monitor active downloads count for badge
   useEffect(() => {
-    const unsub = downloadManager.subscribe((task) => {
-      // Refresh count
-      downloadManager.isDownloaded(surahs[0]).then(() => {
-        // Simple tick
-      });
+    const unsub = downloadManager.subscribe(() => {
+      // Periodic check
     });
     return () => unsub();
   }, [surahs]);
@@ -69,36 +75,38 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {/* Main Content Area */}
+      {/* Main Content Area with Suspense Lazy Loading */}
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 py-4 pb-32">
-        {selectedSurahForReader ? (
-          <ReaderView surah={selectedSurahForReader} onBack={handleBackFromReader} />
-        ) : (
-          <>
-            {currentTab === 'home' && (
-              <HomeView
-                surahs={surahs}
-                onSelectSurah={(s) => setSelectedSurahForReader(s)}
-                onOpenReader={handleOpenReader}
-                onNavigateTab={(t) => setCurrentTab(t)}
-              />
-            )}
+        <Suspense fallback={<PageLoader />}>
+          {selectedSurahForReader ? (
+            <ReaderView surah={selectedSurahForReader} onBack={handleBackFromReader} />
+          ) : (
+            <>
+              {currentTab === 'home' && (
+                <HomeView
+                  surahs={surahs}
+                  onSelectSurah={(s) => setSelectedSurahForReader(s)}
+                  onOpenReader={handleOpenReader}
+                  onNavigateTab={(t) => setCurrentTab(t)}
+                />
+              )}
 
-            {currentTab === 'surahs' && (
-              <SurahListView surahs={surahs} onOpenReader={handleOpenReader} />
-            )}
+              {currentTab === 'surahs' && (
+                <SurahListView surahs={surahs} onOpenReader={handleOpenReader} />
+              )}
 
-            {currentTab === 'downloads' && (
-              <DownloadsView surahs={surahs} onOpenReader={handleOpenReader} />
-            )}
+              {currentTab === 'downloads' && (
+                <DownloadsView surahs={surahs} onOpenReader={handleOpenReader} />
+              )}
 
-            {currentTab === 'bookmarks' && (
-              <BookmarksView surahs={surahs} onOpenReader={handleOpenReader} />
-            )}
+              {currentTab === 'bookmarks' && (
+                <BookmarksView surahs={surahs} onOpenReader={handleOpenReader} />
+              )}
 
-            {currentTab === 'settings' && <SettingsView />}
-          </>
-        )}
+              {currentTab === 'settings' && <SettingsView />}
+            </>
+          )}
+        </Suspense>
       </main>
 
       {/* Sticky Mini Player (visible if a surah is active and not inside full player) */}
