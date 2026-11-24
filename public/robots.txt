@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Host
+Host: https://mlquran.vercel.app
+
+# Sitemap
+Sitemap: https://mlquran.vercel.app/sitemap.xml
