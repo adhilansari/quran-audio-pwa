@@ -138,10 +138,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div className="flex items-center justify-between px-1">
             <h2 className="text-sm font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
               <History className="w-4 h-4 text-emerald-700 dark:text-amber-400" />
-              <span>അവസാനം വായിച്ചവ (Recent Reading)</span>
+              <span>{settings.language === 'ml' ? 'അവസാനം വായിച്ചവ' : 'Recent Reading'}</span>
             </h2>
             <span className="text-[11px] font-semibold text-stone-400">
-              {readingHistory.length} സൂറത്തുകൾ
+              {readingHistory.length} {settings.language === 'ml' ? 'സൂറത്തുകൾ' : 'Surahs'}
             </span>
           </div>
 
@@ -174,7 +174,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400">
-                          ആയത്ത് {item.ayahNumber} / {item.surahTotalAyahs}
+                          {settings.language === 'ml' ? 'ആയത്ത്' : 'Ayah'} {item.ayahNumber} / {item.surahTotalAyahs}
                         </span>
                         <span className="text-[10px] text-stone-400">({progressPct}%)</span>
                       </div>
@@ -191,7 +191,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
                   {/* Resume Reading Button */}
                   <div className="flex items-center gap-1 text-xs font-bold text-emerald-700 dark:text-amber-300 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-900 px-3 py-1.5 rounded-xl transition-all flex-shrink-0 group-hover:shadow-xs">
-                    <span>തുടരുക</span>
+                    <span>{settings.language === 'ml' ? 'തുടരുക' : 'Resume'}</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </div>
                 </div>

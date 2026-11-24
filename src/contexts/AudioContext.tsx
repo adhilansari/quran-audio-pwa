@@ -78,6 +78,11 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const onTimeUpdate = () => {
       setCurrentTime(audio.currentTime);
 
+      // If audio is progressing, ensure buffering state is cleared
+      if (audio.currentTime > 0 && !audio.paused) {
+        setIsLoading(false);
+      }
+
       // Calculate buffered progress
       if (audio.buffered.length > 0) {
         setBuffered(audio.buffered.end(audio.buffered.length - 1));
@@ -103,14 +108,23 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     const onLoadStart = () => {
-      setIsLoading(true);
+      // Only show loading spinner if audio is actively playing or attempting playback
+      if (!audio.paused) {
+        setIsLoading(true);
+      }
     };
 
     const onWaiting = () => {
-      setIsLoading(true);
+      if (!audio.paused) {
+        setIsLoading(true);
+      }
     };
 
     const onCanPlay = () => {
+      setIsLoading(false);
+    };
+
+    const onCanPlayThrough = () => {
       setIsLoading(false);
     };
 
@@ -129,6 +143,10 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setIsPlaying(false);
       setIsLoading(false);
       updateMediaSessionState('paused');
+    };
+
+    const onSeeked = () => {
+      setIsLoading(false);
     };
 
     const onEnded = () => {
@@ -156,9 +174,11 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     audio.addEventListener('loadstart', onLoadStart);
     audio.addEventListener('waiting', onWaiting);
     audio.addEventListener('canplay', onCanPlay);
+    audio.addEventListener('canplaythrough', onCanPlayThrough);
     audio.addEventListener('playing', onPlaying);
     audio.addEventListener('play', onPlay);
     audio.addEventListener('pause', onPause);
+    audio.addEventListener('seeked', onSeeked);
     audio.addEventListener('ended', onEnded);
     audio.addEventListener('error', onError);
 
@@ -168,9 +188,11 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       audio.removeEventListener('loadstart', onLoadStart);
       audio.removeEventListener('waiting', onWaiting);
       audio.removeEventListener('canplay', onCanPlay);
+      audio.removeEventListener('canplaythrough', onCanPlayThrough);
       audio.removeEventListener('playing', onPlaying);
       audio.removeEventListener('play', onPlay);
       audio.removeEventListener('pause', onPause);
+      audio.removeEventListener('seeked', onSeeked);
       audio.removeEventListener('ended', onEnded);
       audio.removeEventListener('error', onError);
       audio.pause();

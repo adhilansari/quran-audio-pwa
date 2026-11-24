@@ -16,9 +16,16 @@ import {
   ChevronDown,
   Share2,
   ChevronsDown,
-  X
+  X,
+  Sliders,
+  ArrowUp,
+  ArrowDown,
+  Sun,
+  Moon,
+  Sparkles,
+  Search
 } from 'lucide-react';
-import { Surah, Ayah } from '@/types';
+import { Surah, Ayah, ThemeMode } from '@/types';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useAudio } from '@/contexts/AudioContext';
 import { isBookmarked, addBookmark, removeBookmark, saveReadingHistory } from '@/services/db';
@@ -54,15 +61,50 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber
   // Progressive Lazy Loading for large chapters (e.g. Al-Baqarah 286 ayahs)
   const [visibleCount, setVisibleCount] = useState(initialAyahNumber ? Math.max(35, initialAyahNumber + 10) : 35);
 
-  // Auto-scroll states & speed controls (0.5x, 1x, 1.5x, 2x, 3x)
+  // Auto-scroll states & speed controls (0.5x to 3.0x)
   const [isAutoScrolling, setIsAutoScrolling] = useState(false);
   const [autoScrollSpeed, setAutoScrollSpeed] = useState<number>(1.0);
   const animationFrameRef = useRef<number | null>(null);
+
+  // Assistive Ball (Floating quick controls with 3-sec auto-fade)
+  const [isAssistiveOpen, setIsAssistiveOpen] = useState(false);
+  const [isFaded, setIsFaded] = useState(false);
+  const [isBlinking, setIsBlinking] = useState(true);
+  const [jumpInputAyah, setJumpInputAyah] = useState('');
+  const fadeTimeoutRef = useRef<any>(null);
 
   // Ayah-level single recitation audio
   const [playingAyahNum, setPlayingAyahNum] = useState<number | null>(null);
   const ayahAudioRef = useRef<HTMLAudioElement | null>(null);
   const ayahRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+
+  // Assistive ball fade timer handler
+  const resetFadeTimer = () => {
+    setIsFaded(false);
+    if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current);
+    fadeTimeoutRef.current = setTimeout(() => {
+      if (!isAssistiveOpen) {
+        setIsFaded(true);
+      }
+    }, 3000);
+  };
+
+  useEffect(() => {
+    // Initial 3-sec gentle discovery blink, then soft fade
+    const blinkTimer = setTimeout(() => {
+      setIsBlinking(false);
+      setIsFaded(true);
+    }, 3000);
+
+    fadeTimeoutRef.current = setTimeout(() => {
+      setIsFaded(true);
+    }, 3000);
+
+    return () => {
+      clearTimeout(blinkTimer);
+      if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current);
+    };
+  }, []);
 
   // Load Chapter Ayahs (IndexedDB -> Static -> Dynamic Open Quran CDN)
   useEffect(() => {
@@ -255,29 +297,62 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber
       ayahAudioRef.current.pause();
     }
 
-    // Global ayah index for CDN audio recitation
-    const globalIdx = ayah.globalAyahNumber;
-    if (globalIdx) {
-      const url = `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${globalIdx}.mp3`;
-      const audio = new Audio(url);
-      ayahAudioRef.current = audio;
-      setPlayingAyahNum(ayah.ayah);
+    const surahPadded = String(surah.number || surah.id).padStart(3, '0');
+    const ayahPadded = String(ayah.ayah).padStart(3, '0');
+    const url = `https://everyayah.com/data/Alafasy_128kbps/${surahPadded}${ayahPadded}.mp3`;
 
-      audio.play().catch(e => {
-        console.warn('Single ayah audio play error:', e);
-        setPlayingAyahNum(null);
-      });
+    const audio = new Audio(url);
+    ayahAudioRef.current = audio;
+    setPlayingAyahNum(ayah.ayah);
 
-      audio.onended = () => {
+    audio.play().catch(e => {
+      console.warn('Single ayah audio play error:', e);
+      if (ayah.globalAyahNumber) {
+        const fallbackUrl = `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${ayah.globalAyahNumber}.mp3`;
+        const fbAudio = new Audio(fallbackUrl);
+        ayahAudioRef.current = fbAudio;
+        fbAudio.play().catch(() => setPlayingAyahNum(null));
+        fbAudio.onended = () => setPlayingAyahNum(null);
+        fbAudio.onerror = () => setPlayingAyahNum(null);
+      } else {
         setPlayingAyahNum(null);
-      };
-      audio.onerror = () => {
-        setPlayingAyahNum(null);
-      };
-    } else {
-      // Fallback: start surah chapter audio
-      playSurah(surah);
+      }
+    });
+
+    audio.onended = () => {
+      setPlayingAyahNum(null);
+    };
+    audio.onerror = () => {
+      setPlayingAyahNum(null);
+    };
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const scrollToBottom = () => {
+    setVisibleCount(ayahs.length);
+    setTimeout(() => {
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+    }, 150);
+  };
+
+  const handleJumpToSpecificAyah = (targetNum?: number) => {
+    const num = targetNum || parseInt(jumpInputAyah, 10);
+    if (!num || num < 1 || num > surah.ayahCount) return;
+    if (num > visibleCount) {
+      setVisibleCount(Math.min(ayahs.length, num + 10));
     }
+    setTimeout(() => {
+      const el = ayahRefs.current.get(num);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setJumpedAyah(num);
+        setTimeout(() => setJumpedAyah(null), 3500);
+      }
+    }, 200);
+    setIsAssistiveOpen(false);
   };
 
   const handleCopyAyah = (ayah: Ayah) => {
@@ -646,7 +721,44 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber
         )}
       </div>
 
-      {/* Floating Auto-Scroll Control Pill (Visible when auto-scroll is active) */}
+      {/* Side Tiny Scroll Speed Controller (Visible when Auto-Scroll is Active) */}
+      {isAutoScrolling && (
+        <div className="fixed right-2.5 sm:right-4 top-1/2 -translate-y-1/2 z-40 bg-emerald-950/90 text-white backdrop-blur-md rounded-2xl py-2 px-1 border border-amber-400/50 shadow-2xl flex flex-col items-center gap-1.5 animate-in slide-in-from-right-3 duration-200">
+          <button
+            onClick={() => setAutoScrollSpeed(prev => Math.min(3.0, +(prev + 0.25).toFixed(2)))}
+            className="w-6 h-6 rounded-lg bg-emerald-900/80 hover:bg-emerald-800 text-amber-300 flex items-center justify-center font-black text-xs transition-colors"
+            title="Speed up scroll"
+          >
+            +
+          </button>
+
+          <span className="text-[10px] font-black text-amber-300 py-0.5 tracking-tighter">
+            {autoScrollSpeed}x
+          </span>
+
+          <button
+            onClick={() => setAutoScrollSpeed(prev => Math.max(0.5, +(prev - 0.25).toFixed(2)))}
+            className="w-6 h-6 rounded-lg bg-emerald-900/80 hover:bg-emerald-800 text-amber-300 flex items-center justify-center font-black text-xs transition-colors"
+            title="Slow down scroll"
+          >
+            -
+          </button>
+
+          <button
+            onClick={() => setIsAutoScrolling(!isAutoScrolling)}
+            className="mt-0.5 w-6 h-6 rounded-full bg-amber-400 text-emerald-950 flex items-center justify-center shadow-xs hover:bg-amber-300 transition-colors"
+            title={isAutoScrolling ? 'Pause' : 'Resume'}
+          >
+            {isAutoScrolling ? (
+              <Pause className="w-2.5 h-2.5 fill-current" />
+            ) : (
+              <Play className="w-2.5 h-2.5 fill-current ml-0.5" />
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* Floating Auto-Scroll Control Pill (Bottom Center) */}
       {isAutoScrolling && (
         <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 bg-emerald-950/95 text-white backdrop-blur-md px-3.5 py-2 rounded-2xl shadow-2xl border border-amber-400/40 flex items-center gap-2.5 animate-in slide-in-from-bottom-3 duration-200">
           <button
@@ -658,7 +770,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber
           </button>
 
           <span className="text-[11px] font-bold text-amber-300 hidden sm:inline">
-            സ്ക്രോൾ വേഗത:
+            {settings.language === 'ml' ? 'സ്ക്രോൾ വേഗത:' : 'Scroll Speed:'}
           </span>
 
           <div className="flex items-center gap-1 bg-emerald-900/70 p-0.5 rounded-xl border border-emerald-800">
@@ -684,6 +796,265 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber
           >
             <X className="w-4 h-4" />
           </button>
+        </div>
+      )}
+
+      {/* Floating Assistive Ball (3-sec gentle blink & soft auto-fade) */}
+      <div
+        className={`fixed right-3 sm:right-5 bottom-24 z-40 transition-all duration-300 ${
+          isFaded ? 'opacity-35 hover:opacity-100 scale-90' : 'opacity-100 scale-100'
+        }`}
+        onMouseEnter={resetFadeTimer}
+        onTouchStart={resetFadeTimer}
+      >
+        <button
+          onClick={() => {
+            resetFadeTimer();
+            setIsAssistiveOpen(!isAssistiveOpen);
+          }}
+          className={`w-12 h-12 rounded-full flex items-center justify-center shadow-2xl transition-all ${
+            isBlinking ? 'animate-pulse ring-4 ring-amber-400/60' : ''
+          } ${
+            isAssistiveOpen
+              ? 'bg-amber-400 text-emerald-950 rotate-90 scale-105'
+              : 'bg-emerald-800 text-amber-300 border-2 border-amber-400/80 hover:scale-105'
+          }`}
+          title="Reading Assistant Settings"
+        >
+          {isAssistiveOpen ? (
+            <X className="w-6 h-6" />
+          ) : (
+            <Sliders className="w-5 h-5 text-amber-300" />
+          )}
+        </button>
+      </div>
+
+      {/* Assistive Ball Reading Quick Settings Sheet */}
+      {isAssistiveOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150"
+          onClick={() => setIsAssistiveOpen(false)}
+        >
+          <div
+            className="bg-white dark:bg-[#12201c] w-full max-w-lg rounded-t-3xl sm:rounded-3xl border border-stone-200 dark:border-emerald-950 shadow-2xl overflow-hidden p-5 space-y-4 max-h-[85vh] overflow-y-auto no-scrollbar animate-in slide-in-from-bottom-5 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Sheet Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-emerald-950">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-amber-400 flex items-center justify-center">
+                  <Sliders className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-stone-900 dark:text-stone-100">
+                    {settings.language === 'ml' ? 'വായനാ ക്രമീകരണങ്ങൾ' : 'Reading Assistant'}
+                  </h3>
+                  <p className="text-[11px] text-stone-500 dark:text-stone-400">
+                    {surah.malayalamName} • {surah.englishName}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsAssistiveOpen(false)}
+                className="p-1.5 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 rounded-lg hover:bg-stone-100 dark:hover:bg-emerald-950"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* 1. Auto-Scroll Control */}
+            <div className="bg-stone-50 dark:bg-emerald-950/40 p-3 rounded-2xl border border-stone-200 dark:border-emerald-900 space-y-2">
+              <div className="flex items-center justify-between text-xs font-bold text-stone-800 dark:text-stone-200">
+                <span className="flex items-center gap-1.5">
+                  <ChevronsDown className="w-4 h-4 text-amber-500" />
+                  <span>{settings.language === 'ml' ? 'ഓട്ടോ സ്ക്രോൾ' : 'Auto-Scroll'}</span>
+                </span>
+                <button
+                  onClick={() => setIsAutoScrolling(!isAutoScrolling)}
+                  className={`px-3 py-1 rounded-xl font-bold text-xs flex items-center gap-1 transition-all ${
+                    isAutoScrolling
+                      ? 'bg-amber-400 text-emerald-950 shadow-xs'
+                      : 'bg-emerald-800 text-amber-300'
+                  }`}
+                >
+                  {isAutoScrolling ? <Pause className="w-3 h-3 fill-current" /> : <Play className="w-3 h-3 fill-current" />}
+                  <span>{isAutoScrolling ? 'Pause' : 'Start'}</span>
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between pt-1 text-[11px]">
+                <span className="text-stone-500 dark:text-stone-400 font-medium">
+                  {settings.language === 'ml' ? 'വേഗത:' : 'Speed:'}
+                </span>
+                <div className="flex items-center gap-1">
+                  {[0.5, 1.0, 1.5, 2.0, 3.0].map((spd) => (
+                    <button
+                      key={spd}
+                      onClick={() => setAutoScrollSpeed(spd)}
+                      className={`px-2 py-0.5 rounded-lg font-bold text-xs transition-all ${
+                        autoScrollSpeed === spd
+                          ? 'bg-emerald-800 text-amber-300 shadow-xs'
+                          : 'bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 text-stone-700 dark:text-stone-300'
+                      }`}
+                    >
+                      {spd}x
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Instant Theme Switcher */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-stone-800 dark:text-stone-200 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>{settings.language === 'ml' ? 'തീം (Themes)' : 'Theme'}</span>
+              </label>
+              <div className="grid grid-cols-5 gap-1.5">
+                {[
+                  { id: 'light', label: settings.language === 'ml' ? 'ലൈറ്റ്' : 'Light', icon: '☀️' },
+                  { id: 'dark', label: settings.language === 'ml' ? 'ഡാർക്ക്' : 'Dark', icon: '🌙' },
+                  { id: 'sepia', label: settings.language === 'ml' ? 'സെപിയ' : 'Sepia', icon: '📜' },
+                  { id: 'midnight', label: 'AMOLED', icon: '🖤' },
+                  { id: 'system', label: settings.language === 'ml' ? 'സിസ്റ്റം' : 'Auto', icon: '⚙️' }
+                ].map((th) => (
+                  <button
+                    key={th.id}
+                    onClick={() => updateSetting('theme', th.id as ThemeMode)}
+                    className={`py-1.5 px-1 rounded-xl text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 border transition-all ${
+                      settings.theme === th.id
+                        ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs'
+                        : 'bg-stone-50 dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-300'
+                    }`}
+                  >
+                    <span>{th.icon}</span>
+                    <span className="truncate max-w-[50px]">{th.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 3. Typography Adjustments */}
+            <div className="space-y-2.5 pt-1">
+              {/* Arabic Font Slider */}
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-stone-700 dark:text-stone-300">
+                  {settings.language === 'ml' ? 'അറബിക് ഫോണ്ട്' : 'Arabic Font'}: {settings.arabicFontSize}px
+                </span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => updateSetting('arabicFontSize', Math.max(20, settings.arabicFontSize - 2))}
+                    className="w-7 h-7 rounded-lg bg-stone-100 dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 font-bold flex items-center justify-center text-xs"
+                  >
+                    -
+                  </button>
+                  <button
+                    onClick={() => updateSetting('arabicFontSize', Math.min(44, settings.arabicFontSize + 2))}
+                    className="w-7 h-7 rounded-lg bg-stone-100 dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 font-bold flex items-center justify-center text-xs"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Malayalam Font Slider */}
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-stone-700 dark:text-stone-300">
+                  {settings.language === 'ml' ? 'മലയാളം ഫോണ്ട്' : 'Malayalam Font'}: {settings.malayalamFontSize}px
+                </span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => updateSetting('malayalamFontSize', Math.max(13, settings.malayalamFontSize - 1))}
+                    className="w-7 h-7 rounded-lg bg-stone-100 dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 font-bold flex items-center justify-center text-xs"
+                  >
+                    -
+                  </button>
+                  <button
+                    onClick={() => updateSetting('malayalamFontSize', Math.min(26, settings.malayalamFontSize + 1))}
+                    className="w-7 h-7 rounded-lg bg-stone-100 dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 font-bold flex items-center justify-center text-xs"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Visibility Toggles */}
+            <div className="grid grid-cols-2 gap-2 pt-1 border-t border-stone-100 dark:border-emerald-950 text-xs">
+              <button
+                onClick={() => updateSetting('showArabic', !settings.showArabic)}
+                className={`py-2 px-3 rounded-xl border flex items-center justify-center gap-1.5 font-semibold transition-all ${
+                  settings.showArabic
+                    ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
+                    : 'bg-stone-50 dark:bg-emerald-950/30 border-stone-200 dark:border-emerald-900 text-stone-400'
+                }`}
+              >
+                {settings.showArabic ? <Eye className="w-3.5 h-3.5 text-emerald-600" /> : <EyeOff className="w-3.5 h-3.5" />}
+                <span>{settings.language === 'ml' ? 'അറബിക്' : 'Arabic'}</span>
+              </button>
+
+              <button
+                onClick={() => updateSetting('showMalayalam', !settings.showMalayalam)}
+                className={`py-2 px-3 rounded-xl border flex items-center justify-center gap-1.5 font-semibold transition-all ${
+                  settings.showMalayalam
+                    ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
+                    : 'bg-stone-50 dark:bg-emerald-950/30 border-stone-200 dark:border-emerald-900 text-stone-400'
+                }`}
+              >
+                {settings.showMalayalam ? <Eye className="w-3.5 h-3.5 text-emerald-600" /> : <EyeOff className="w-3.5 h-3.5" />}
+                <span>{settings.language === 'ml' ? 'മലയാളം' : 'Malayalam'}</span>
+              </button>
+            </div>
+
+            {/* 5. Navigation Jumps */}
+            <div className="pt-2 border-t border-stone-100 dark:border-emerald-950 space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <button
+                  onClick={() => {
+                    scrollToTop();
+                    setIsAssistiveOpen(false);
+                  }}
+                  className="flex-1 py-2 px-2.5 rounded-xl bg-stone-100 dark:bg-emerald-950/60 border border-stone-200 dark:border-emerald-900 text-xs font-bold text-stone-700 dark:text-stone-300 flex items-center justify-center gap-1 hover:bg-stone-200"
+                >
+                  <ArrowUp className="w-3.5 h-3.5 text-amber-500" />
+                  <span>{settings.language === 'ml' ? 'മുകളിലേക്ക്' : 'Top'}</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    scrollToBottom();
+                    setIsAssistiveOpen(false);
+                  }}
+                  className="flex-1 py-2 px-2.5 rounded-xl bg-stone-100 dark:bg-emerald-950/60 border border-stone-200 dark:border-emerald-900 text-xs font-bold text-stone-700 dark:text-stone-300 flex items-center justify-center gap-1 hover:bg-stone-200"
+                >
+                  <ArrowDown className="w-3.5 h-3.5 text-amber-500" />
+                  <span>{settings.language === 'ml' ? 'താഴേക്ക്' : 'Bottom'}</span>
+                </button>
+              </div>
+
+              {/* Jump to specific Ayah */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  max={surah.ayahCount}
+                  placeholder={`${settings.language === 'ml' ? 'ആയത്ത് # (1-' : 'Ayah # (1-'}${surah.ayahCount})`}
+                  value={jumpInputAyah}
+                  onChange={(e) => setJumpInputAyah(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleJumpToSpecificAyah();
+                  }}
+                  className="flex-1 px-3 py-1.5 rounded-xl bg-stone-100 dark:bg-emerald-950/80 border border-stone-200 dark:border-emerald-900 text-xs text-stone-900 dark:text-stone-100 focus:outline-none focus:border-amber-400"
+                />
+                <button
+                  onClick={() => handleJumpToSpecificAyah()}
+                  className="px-3.5 py-1.5 rounded-xl bg-emerald-800 text-amber-300 font-bold text-xs hover:bg-emerald-700"
+                >
+                  {settings.language === 'ml' ? 'പോവുക' : 'Go'}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
