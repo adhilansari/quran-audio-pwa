@@ -37,11 +37,13 @@ export const APP_CONFIG = {
   defaultArabicFontSize: 28,
   defaultMalayalamFontSize: 17,
 
-  // Credits
+  // Credits & Developer Contact
   credits: {
     reciter: "Mishary Rashid Alafasy / Sheikh Abdul Basit (Arabic)",
     malayalamTranslation: "Cheriyamundam Abdul Hameed Madani & Kunhi Mohammed Parappoor",
     malayalamVoice: "Al-Quran Malayalam Audio Project",
-    developer: "Senior PWA Team"
+    developer: "Adhil Ansari",
+    developerUrl: "https://adhilansari.vercel.app/",
+    coffeeUrl: "https://buymeacoffee.com/adhilansari"
   }
 };

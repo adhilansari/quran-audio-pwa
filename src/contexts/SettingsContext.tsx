@@ -55,10 +55,15 @@ const translations: Record<UILanguage, Record<string, string>> = {
     storageAvailable: "ലഭ്യമായ സംഭരണം",
     enablePersistence: "സംഭരണ സംരക്ഷണം ഉറപ്പാക്കുക",
     persistedActive: "സംഭരണ സംരക്ഷണം സജീവമാണ്",
-    theme: "തീം",
+    theme: "തീം (Appearance)",
     themeSystem: "സിസ്റ്റം",
-    themeLight: "ലൈറ്റ്",
-    themeDark: "ഡാർക്ക്",
+    themeLight: "ലൈറ്റ് (Light)",
+    themeDark: "എമറാൾഡ് (Dark)",
+    themeSepia: "സെപിയ (Sepia)",
+    themeMidnight: "മിഡ്നൈറ്റ് (AMOLED)",
+    builtBy: "നിർമ്മാണം (Developed by)",
+    supportProject: "സഹായിക്കുക (Support)",
+    portfolio: "പോർട്ട്ഫോളിയോ",
     language: "ഭാഷ (Language)",
     arabicSize: "അറബിക് ഫോണ്ട് വലിപ്പം",
     malayalamSize: "മലയാളം ഫോണ്ട് വലിപ്പം",
@@ -119,7 +124,12 @@ const translations: Record<UILanguage, Record<string, string>> = {
     theme: "Theme",
     themeSystem: "System",
     themeLight: "Light",
-    themeDark: "Dark",
+    themeDark: "Emerald Dark",
+    themeSepia: "Sepia (Warm)",
+    themeMidnight: "Midnight (AMOLED)",
+    builtBy: "Built by",
+    supportProject: "Buy Me a Coffee",
+    portfolio: "Portfolio",
     language: "Language",
     arabicSize: "Arabic Font Size",
     malayalamSize: "Malayalam Font Size",
@@ -174,14 +184,21 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Sync theme to DOM
   useEffect(() => {
     const root = document.documentElement;
-    const isDark =
-      settings.theme === 'dark' ||
-      (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    root.classList.remove('dark', 'sepia', 'midnight', 'light');
 
-    if (isDark) {
+    let activeTheme = settings.theme;
+    if (activeTheme === 'system') {
+      activeTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    if (activeTheme === 'dark') {
       root.classList.add('dark');
+    } else if (activeTheme === 'sepia') {
+      root.classList.add('sepia');
+    } else if (activeTheme === 'midnight') {
+      root.classList.add('dark', 'midnight');
     } else {
-      root.classList.remove('dark');
+      root.classList.add('light');
     }
   }, [settings.theme]);
 

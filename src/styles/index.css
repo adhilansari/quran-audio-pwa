@@ -14,7 +14,7 @@
     -webkit-tap-highlight-color: transparent;
     padding-bottom: env(safe-area-inset-bottom);
     padding-top: env(safe-area-inset-top);
-    transition: background-color 0.25s ease, color 0.25s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
@@ -31,7 +31,70 @@
   line-height: 1.8;
 }
 
-/* Custom Islamic pattern background */
+/* Theme Styles: Sepia / Warm Reading Oasis */
+html.sepia,
+html.sepia body {
+  background-color: #f7f2e7 !important;
+  color: #3b2a1a !important;
+}
+
+html.sepia .bg-white,
+html.sepia .dark\:bg-\[\#12201c\],
+html.sepia .bg-\[\#faf8f5\] {
+  background-color: #fffbf3 !important;
+  border-color: #e6dac6 !important;
+  color: #3b2a1a !important;
+}
+
+html.sepia .text-stone-900,
+html.sepia .dark\:text-stone-100 {
+  color: #382413 !important;
+}
+
+html.sepia .text-stone-600,
+html.sepia .dark\:text-stone-300,
+html.sepia .text-stone-500 {
+  color: #715842 !important;
+}
+
+html.sepia header,
+html.sepia nav {
+  background-color: rgba(247, 242, 231, 0.96) !important;
+  border-color: #e6dac6 !important;
+}
+
+/* Theme Styles: Midnight AMOLED Pure Black */
+html.midnight,
+html.midnight body {
+  background-color: #000000 !important;
+  color: #eceff1 !important;
+}
+
+html.midnight .bg-white,
+html.midnight .dark\:bg-\[\#12201c\],
+html.midnight .bg-\[\#faf8f5\] {
+  background-color: #0d0f11 !important;
+  border-color: #1f2429 !important;
+  color: #eceff1 !important;
+}
+
+html.midnight .text-stone-900,
+html.midnight .dark\:text-stone-100 {
+  color: #f8fafc !important;
+}
+
+html.midnight .text-stone-600,
+html.midnight .dark\:text-stone-300 {
+  color: #94a3b8 !important;
+}
+
+html.midnight header,
+html.midnight nav {
+  background-color: rgba(0, 0, 0, 0.96) !important;
+  border-color: #1a1e22 !important;
+}
+
+/* Islamic arabesque subtle geometric background */
 .bg-islamic-pattern {
   background-color: #064e3b;
   background-image: radial-gradient(#d97706 0.75px, transparent 0.75px), radial-gradient(#d97706 0.75px, #064e3b 0.75px);

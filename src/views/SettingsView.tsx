@@ -9,7 +9,11 @@ import {
   Info,
   DownloadCloud,
   CheckCircle2,
-  Heart
+  Heart,
+  ExternalLink,
+  Coffee,
+  Sparkles,
+  BookOpen
 } from 'lucide-react';
 import { useSettings } from '@/contexts/SettingsContext';
 import { APP_CONFIG } from '@/config';
@@ -21,8 +25,10 @@ export const SettingsView: React.FC = () => {
 
   const themes: { id: ThemeMode; label: string; icon: React.ReactNode }[] = [
     { id: 'system', label: t('themeSystem'), icon: <span className="text-xs">⚙️</span> },
-    { id: 'light', label: t('themeLight'), icon: <Sun className="w-4 h-4 text-amber-500" /> },
-    { id: 'dark', label: t('themeDark'), icon: <Moon className="w-4 h-4 text-emerald-400" /> }
+    { id: 'light', label: t('themeLight'), icon: <Sun className="w-3.5 h-3.5 text-amber-500" /> },
+    { id: 'dark', label: t('themeDark'), icon: <Moon className="w-3.5 h-3.5 text-emerald-400" /> },
+    { id: 'sepia', label: t('themeSepia'), icon: <span className="text-xs">📜</span> },
+    { id: 'midnight', label: t('themeMidnight'), icon: <span className="text-xs">🖤</span> }
   ];
 
   const languages: { id: UILanguage; label: string }[] = [
@@ -35,22 +41,22 @@ export const SettingsView: React.FC = () => {
       {/* 1. Appearance / Theme */}
       <div className="bg-white dark:bg-[#12201c] rounded-2xl border border-stone-200 dark:border-emerald-950 p-4 shadow-sm">
         <h3 className="font-bold text-sm text-stone-900 dark:text-stone-100 mb-3 flex items-center gap-2">
-          <Sun className="w-4 h-4 text-amber-500" />
+          <Sparkles className="w-4 h-4 text-amber-500" />
           <span>{t('theme')}</span>
         </h3>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
           {themes.map(th => (
             <button
               key={th.id}
               onClick={() => updateSetting('theme', th.id)}
-              className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all ${
+              className={`py-2 px-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all ${
                 settings.theme === th.id
-                  ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-sm font-bold'
+                  ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-sm font-bold scale-[1.02]'
                   : 'bg-stone-50 dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-300 hover:bg-stone-100'
               }`}
             >
               {th.icon}
-              <span>{th.label}</span>
+              <span className="truncate">{th.label}</span>
             </button>
           ))}
         </div>
@@ -172,7 +178,54 @@ export const SettingsView: React.FC = () => {
         </div>
       )}
 
-      {/* 7. About & Credits */}
+      {/* 7. Developer & Support */}
+      <div className="bg-gradient-to-br from-stone-50 via-white to-amber-50/50 dark:from-[#0d1714] dark:via-[#12201c] dark:to-[#172b25] rounded-2xl border border-stone-200 dark:border-emerald-950 p-4 shadow-sm space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 flex items-center justify-center text-white shadow-sm">
+              <Heart className="w-4 h-4 fill-white text-white" />
+            </div>
+            <div>
+              <div className="text-[11px] font-medium text-stone-500 dark:text-stone-400">
+                Built with ❤️ by
+              </div>
+              <div className="text-sm font-bold text-stone-900 dark:text-amber-300">
+                {APP_CONFIG.credits.developer}
+              </div>
+            </div>
+          </div>
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+            Free & Open
+          </span>
+        </div>
+
+        <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">
+          For bug reports, questions, feedback, or further project updates:
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
+          <a
+            href={APP_CONFIG.credits.developerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-emerald-950/60 border border-stone-200 dark:border-emerald-900 text-stone-800 dark:text-stone-200 hover:border-emerald-500 hover:text-emerald-700 dark:hover:text-amber-300 transition-all shadow-xs"
+          >
+            <ExternalLink className="w-3.5 h-3.5 text-emerald-600 dark:text-amber-400" />
+            <span>adhilansari.vercel.app</span>
+          </a>
+          <a
+            href={APP_CONFIG.credits.coffeeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-amber-400 text-emerald-950 hover:bg-amber-300 transition-all shadow-xs"
+          >
+            <Coffee className="w-3.5 h-3.5" />
+            <span>Buy Me a Coffee ☕</span>
+          </a>
+        </div>
+      </div>
+
+      {/* 8. About & Credits */}
       <div className="bg-white dark:bg-[#12201c] rounded-2xl border border-stone-200 dark:border-emerald-950 p-4 shadow-sm text-xs space-y-2 text-stone-600 dark:text-stone-400">
         <h3 className="font-bold text-sm text-stone-900 dark:text-stone-100 mb-2 flex items-center gap-1.5">
           <Info className="w-4 h-4 text-emerald-600 dark:text-amber-400" />

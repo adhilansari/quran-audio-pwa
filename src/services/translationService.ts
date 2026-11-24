@@ -34,10 +34,13 @@ export async function loadSurahAyahs(surahId: number): Promise<Ayah[]> {
     // Continue to network fetch
   }
 
-  // 3. High-speed dynamic fetch from open Quran CDN API
+  // 3. High-speed dynamic fetch from open Quran CDN API (with 6s timeout for low-network resilience)
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
     const apiUrl = `https://api.alquran.cloud/v1/surah/${surahId}/editions/quran-uthmani,ml.abdulhameed`;
-    const res = await fetch(apiUrl, { cache: 'force-cache' });
+    const res = await fetch(apiUrl, { cache: 'force-cache', signal: controller.signal });
+    clearTimeout(timeoutId);
     if (res.ok) {
       const json = await res.json();
       if (json.code === 200 && Array.isArray(json.data) && json.data.length >= 2) {

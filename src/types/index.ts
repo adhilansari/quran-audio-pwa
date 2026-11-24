@@ -60,7 +60,7 @@ export interface PlayHistory {
   lastPlayedAt: number;
 }
 
-export type ThemeMode = 'system' | 'light' | 'dark';
+export type ThemeMode = 'system' | 'light' | 'dark' | 'sepia' | 'midnight';
 export type UILanguage = 'ml' | 'en';
 export type RepeatMode = 'off' | 'surah' | 'all';
 

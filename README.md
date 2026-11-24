@@ -46,11 +46,21 @@ An aesthetic, production-grade, offline-first Progressive Web App (PWA): a compl
 
 ---
 
-### 4. 🎨 Themes & Design System
-* **Warm Ivory Light Mode:** Off-white parchment aesthetic (`#faf8f5`), soothing for daytime reading.
-* **Deep Charcoal-Emerald Dark Mode:** High-contrast, battery-friendly dark theme (`#0b1411` and `#12201c`) with warm gold accents (`#f59e0b`).
-* **System Match:** Automatically synchronizes with your device preference.
-* **Tailwind v4 Integration:** Configured with custom CSS variants to support instant runtime theme switching.
+### 4. 🎨 5 Useful Themes & Visual Design
+* **Warm Ivory Light Mode:** Off-white parchment aesthetic (`#faf8f5`), soothing for daytime reading with zero eye fatigue.
+* **Deep Emerald Dark Mode:** Elegant Islamic emerald and charcoal palette (`#0b1411` and `#12201c`) accented with warm amber golds (`#f59e0b`).
+* **Sepia Reading Oasis:** Calming, nostalgic book-paper tone (`#f7f2e7` with `#3b2a1a` typography) engineered specifically for long recitation sessions.
+* **Midnight AMOLED Pure Black:** True `#000000` pitch black for maximum OLED battery savings and nighttime reading in low light.
+* **System Automatic:** Dynamically synchronizes with your OS-level dark/light preference.
+* **Tailwind CSS v4 Integration:** Fully hardware-accelerated theme variants with instant zero-flicker transitions.
+
+---
+
+### 5. 🌐 Low-Network & Spotty Connectivity Resilience
+* **Zero Waiting for Scripture:** All 114 Surahs' Arabic and Malayalam texts are pre-bundled and automatically mirrored into **IndexedDB**, guaranteeing instantaneous opening even on 2G connections or when completely disconnected.
+* **Fast-Timeout Fallbacks:** Dynamic API fetches fail fast (6s timeout) to bundled data rather than hanging the user interface.
+* **Streaming Audio Buffering:** Real-time loading indicators (`Loader2`) give immediate visual feedback during network buffering on slow mobile connections.
+* **Cellular Data Warning:** Optional prompt to protect users from unexpectedly exhausting mobile data allowances.
 
 ---
 
@@ -142,6 +152,16 @@ quran-audio-pwa/
 2. Set Environment Variable:
    - `VITE_AUDIO_BASE_URL`: `https://pub-your-id.r2.dev` (or your custom domain)
 3. Deploy! Vercel handles HTTPS, global edge CDN, and atomic zero-downtime builds.
+
+---
+
+## 👨‍💻 Author & Maintainer
+
+Built with ❤️ by **Adhil Ansari**
+* 🌐 **Portfolio & Contact:** [adhilansari.vercel.app](https://adhilansari.vercel.app/)
+* ☕ **Support the Project:** [buymeacoffee.com/adhilansari](https://buymeacoffee.com/adhilansari)
+
+Feel free to connect for future updates, feature requests, or collaboration!
 
 ---
 
