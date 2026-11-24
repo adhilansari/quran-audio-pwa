@@ -790,46 +790,13 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber
               <Play className="w-2.5 h-2.5 fill-current ml-0.5" />
             )}
           </button>
-        </div>
-      )}
-
-      {/* Floating Auto-Scroll Control Pill (Bottom Center) */}
-      {isAutoScrolling && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 bg-emerald-950/95 text-white backdrop-blur-md px-3.5 py-2 rounded-2xl shadow-2xl border border-amber-400/40 flex items-center gap-2.5 animate-in slide-in-from-bottom-3 duration-200">
-          <button
-            onClick={() => setIsAutoScrolling(!isAutoScrolling)}
-            className="w-7 h-7 rounded-xl bg-amber-400 text-emerald-950 flex items-center justify-center font-bold shadow-xs hover:bg-amber-300 transition-colors"
-            title="Pause auto-scroll"
-          >
-            <Pause className="w-3.5 h-3.5 fill-current" />
-          </button>
-
-          <span className="text-[11px] font-bold text-amber-300 hidden sm:inline">
-            {settings.language === 'ml' ? 'സ്ക്രോൾ വേഗത:' : 'Scroll Speed:'}
-          </span>
-
-          <div className="flex items-center gap-1 bg-emerald-900/70 p-0.5 rounded-xl border border-emerald-800">
-            {[0.5, 1.0, 1.5, 2.0, 3.0].map((spd) => (
-              <button
-                key={spd}
-                onClick={() => setAutoScrollSpeed(spd)}
-                className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition-all ${
-                  autoScrollSpeed === spd
-                    ? 'bg-amber-400 text-emerald-950 shadow-xs'
-                    : 'text-emerald-200 hover:text-white'
-                }`}
-              >
-                {spd}x
-              </button>
-            ))}
-          </div>
 
           <button
             onClick={() => setIsAutoScrolling(false)}
-            className="p-1 text-emerald-300 hover:text-white transition-colors"
+            className="mt-0.5 p-1 text-emerald-300 hover:text-white rounded-lg transition-colors"
             title="Close auto-scroll"
           >
-            <X className="w-4 h-4" />
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       )}
