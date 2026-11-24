@@ -1,258 +1,153 @@
-# Quran Malayalam Audio (ഖുർആൻ മലയാളം ഓഡിയോ)
+# 📖 Quran Malayalam Audio (ഖുർആൻ മലയാളം ഓഡിയോ)
 
-A production-ready, offline-first Progressive Web App (PWA) Quran audio player featuring complete chapter-by-chapter recitation with Malayalam translation, ayah-by-ayah reading view, Media Session API for background/lock-screen controls, and true offline caching with HTTP Range request support for seamless seeking across Android and iOS Safari.
+[![Production](https://img.shields.io/badge/Live-mlquran.vercel.app-065f46?style=for-the-badge&logo=vercel)](https://mlquran.vercel.app/)
+[![PWA](https://img.shields.io/badge/PWA-Offline--First-d97706?style=for-the-badge&logo=pwa)](https://mlquran.vercel.app/)
+[![React](https://img.shields.io/badge/React_19-TypeScript-0284c7?style=for-the-badge&logo=react)](https://react.dev/)
+[![Tailwind](https://img.shields.io/badge/Tailwind_CSS_v4-064e3b?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
+[![Cloudflare R2](https://img.shields.io/badge/Audio-Cloudflare_R2-f97316?style=for-the-badge&logo=cloudflare)](https://cloudflare.com/)
 
----
+An aesthetic, production-grade, offline-first Progressive Web App (PWA): a complete Quran audio player paired with chapter-by-chapter and verse-by-verse Malayalam translation (*Cheriyamundam Abdul Hameed Madani & Kunhi Mohammed Parappoor*).
 
-## 🌟 Key Features
-
-1. **Dual Language UI (Malayalam & English):** Instant language toggle, preserving complete RTL layout for Arabic Uthmani text alongside clear Malayalam typography (*Noto Sans Malayalam* / *Manjari*).
-2. **Offline-First Audio Architecture:**
-   - Stream Surah audio dynamically from Cloudflare R2 when online.
-   - One-tap or batch download surahs with real-time progress (`0%–100%`).
-   - Custom Service Worker with **HTTP Range Request slicing** (`206 Partial Content`) so offline seeking works flawlessly on iOS Safari and Android Chrome.
-   - Persistent storage requests (`navigator.storage.persist()`) and quota estimation (`navigator.storage.estimate()`).
-3. **Audio Player Engine:**
-   - Sticky bottom Mini-Player & Full-screen modal player.
-   - Controls: Play/Pause, ±15s fast scrub, seek bar, previous/next surah, speed control (0.75x–2.0x), repeat (off/surah/all).
-   - Sleep timer (15m, 30m, 45m, 60m, end of surah) with countdown display.
-   - Full **Media Session API** integration (album art, reciter name, lock-screen notification controls).
-   - Position auto-resume from last listening session.
-4. **Ayah-by-Ayah Malayalam Reader:**
-   - Arabic scripture (Amiri Uthmani script) paired directly above Malayalam translation.
-   - Independent Font Size Sliders (A- / A+) for both scripts.
-   - Eye toggles to show/hide Arabic text or Malayalam translation.
-   - Optional Ayah-level timestamp highlighting (`timings/{surah}.json`) with auto-scroll. If timings are omitted, falls back smoothly without faking.
-   - Bookmarking individual Ayahs or entire Surahs into IndexedDB.
-5. **Modern PWA:**
-   - Installable on iOS (Safari Add to Home Screen) and Android (Native install prompt).
-   - App shell and JSON translations precached via Workbox.
-   - Update prompt banner when new app versions deploy.
+**Live Production Link:** [https://mlquran.vercel.app/](https://mlquran.vercel.app/)
 
 ---
 
-## 📁 Project Structure
+## 🌟 Key Highlights & Architecture
+
+### 1. 📖 Complete 114 Surahs Reading Experience
+* **Authentic Typography:** Arabic Uthmani text rendered with the elegant *Amiri* / *Scheherazade New* fonts, paired directly with legible Malayalam script (*Noto Sans Malayalam* / *Manjari*).
+* **Pre-bundled & Cached:** All 114 Surahs are bundled as static JSON data and automatically synced to IndexedDB for 100% offline access.
+* **Progressive Lazy Rendering:** Large chapters (such as Surah Al-Baqarah with 286 verses) load in 0ms with buttery-smooth 60 FPS scrolling through intelligent virtualized chunking.
+* **Reading Customization:**
+  - Independent font size sliders for both Arabic and Malayalam.
+  - Toggles to show/hide Arabic text or Malayalam translation.
+  - One-tap copy for verses with citation (e.g. `[ഖുർആൻ 2:255]`).
+  - Ayah-level bookmarking.
+
+---
+
+### 2. 🎧 Dual Audio System (Chapter-Level & Ayah-Level)
+* **Chapter Audio Recitation (Cloudflare R2):**
+  - High-fidelity continuous recitation for all 114 Surahs.
+  - Hosted on **Cloudflare R2** with zero egress fees and global CDN edge routing.
+  - Full **Media Session API** support: lock-screen controls, notification bar artwork, Bluetooth play/pause/seek controls.
+  - Controls: Play/Pause, ±15s fast scrub, repeat (off / surah / all), sleep timer (15m, 30m, 45m, 60m, end of surah), playback speed (0.75x–2.0x), and auto-resume where you left off.
+* **Ayah-by-Ayah Audio Recitation:**
+  - Every verse in the reader view includes an individual speaker button to listen to that specific verse's recitation on demand.
+
+---
+
+### 3. ⚡ Offline Downloads & HTTP Range Requests
+* **True Offline Caching:** Download single Surahs, selections, or the entire Quran (~1.31 GB) with real-time percentage progress bars (`0%–100%`).
+* **Service Worker HTTP Range Request Slicing (`206 Partial Content`):**
+  - **The iOS Safari Problem:** On iOS/Safari, `<audio>` elements fail or refuse to seek cached media if the service worker responds with a regular `200 OK`.
+  - **Our Solution:** A custom Workbox service worker in `src/sw.ts` parses incoming byte range headers (`Range: bytes=start-end`), slices the cached ArrayBuffer in memory, and returns an HTTP `206 Partial Content` with `Accept-Ranges: bytes` and `Content-Range`. Seeking works offline across iOS, Android, and Desktop.
+* **Storage Manager:** Inspect storage usage vs available quota via `navigator.storage.estimate()` and request persistent storage via `navigator.storage.persist()`.
+
+---
+
+### 4. 🎨 Themes & Design System
+* **Warm Ivory Light Mode:** Off-white parchment aesthetic (`#faf8f5`), soothing for daytime reading.
+* **Deep Charcoal-Emerald Dark Mode:** High-contrast, battery-friendly dark theme (`#0b1411` and `#12201c`) with warm gold accents (`#f59e0b`).
+* **System Match:** Automatically synchronizes with your device preference.
+* **Tailwind v4 Integration:** Configured with custom CSS variants to support instant runtime theme switching.
+
+---
+
+## 📁 Repository Structure
 
 ```
 quran-audio-pwa/
 ├── public/
 │   ├── data/
-│   │   ├── surahs.json                 # 114 Surahs metadata manifest
-│   │   ├── translations/
-│   │   │   ├── 1.json                  # Surah 1 (Al-Fatihah) translation
-│   │   │   ├── 112.json                # Surah 112 (Al-Ikhlas)
-│   │   │   ├── 113.json                # Surah 113 (Al-Falaq)
-│   │   │   └── 114.json                # Surah 114 (An-Nas)
+│   │   ├── surahs.json                 # 114 canonical Surahs metadata
+│   │   ├── translations/               # 114 complete Surah JSON files
+│   │   │   ├── 1.json to 114.json      # Full Arabic Uthmani + Malayalam text
 │   │   └── timings/
 │   │       └── 1.json                  # Surah 1 Ayah-level timestamps
-│   ├── icons/
-│   │   ├── icon.svg                    # Vector brand icon
-│   │   ├── pwa-192x192.png             # 192px PWA icon
-│   │   ├── pwa-512x512.png             # 512px PWA maskable icon
-│   │   └── apple-touch-icon.png        # iOS Home icon
+│   ├── icons/                          # PWA icons (192x192, 512x512 maskable, SVG)
 │   └── favicon.ico
-├── scripts/
-│   ├── build-manifest.js               # Scans audio directory & creates surahs.json
-│   ├── build-translation.js            # Parses raw chapter text into translations JSON
-│   └── generate-icons.js               # PWA icon generator helper
 ├── src/
 │   ├── components/
 │   │   ├── BottomNav.tsx               # 5-tab persistent bottom navigation
 │   │   ├── FullPlayer.tsx              # Full-screen player modal with scrubber
 │   │   ├── MiniPlayer.tsx              # Sticky persistent mini player
-│   │   ├── Navbar.tsx                  # Top brand, online/offline badge, theme & lang
-│   │   └── StorageManager.tsx          # IndexedDB / Cache storage monitor & persist
+│   │   ├── Navbar.tsx                  # Top bar with online indicator & theme switch
+│   │   └── StorageManager.tsx          # IndexedDB / Cache storage monitor
 │   ├── contexts/
 │   │   ├── AudioContext.tsx            # HTML5 Audio, Media Session, Sleep Timer
-│   │   └── SettingsContext.tsx         # Theme, UI strings, font sizes, install prompt
-│   ├── data/
-│   │   └── surahs.json                 # Bundled manifest mirror
+│   │   └── SettingsContext.tsx         # Theme, UI strings, font sizes
 │   ├── services/
-│   │   ├── db.ts                       # IndexedDB (idb) schema & queries
+│   │   ├── db.ts                       # IndexedDB schemas (settings, bookmarks, downloads)
 │   │   ├── downloader.ts               # Streaming fetch download manager
-│   │   └── storage.ts                  # Storage persistence & quota manager
-│   ├── styles/
-│   │   └── index.css                   # Tailwind v4, fonts & Islamic design tokens
-│   ├── types/
-│   │   └── index.ts                    # TypeScript data contracts & models
-│   ├── views/
-│   │   ├── BookmarksView.tsx           # Bookmarked Ayahs and Surahs
-│   │   ├── DownloadsView.tsx           # Offline manager & batch download
+│   │   ├── storage.ts                  # Storage persistence & quota manager
+│   │   └── translationService.ts       # Scripture and translation loader
+│   ├── views/                          # Code-split lazy loaded views
 │   │   ├── HomeView.tsx                # Daily Ayah, continue listening, quick access
+│   │   ├── SurahListView.tsx           # Search & filter tabs (All, Downloaded, Saved)
 │   │   ├── ReaderView.tsx              # Ayah-by-ayah reading & audio sync
-│   │   ├── SettingsView.tsx            # Theme, language, fonts, credits
-│   │   └── SurahListView.tsx           # Search & filter tabs (All, Downloaded, Saved)
-│   ├── App.tsx                         # Main app router & layout
-│   ├── config.ts                       # Centralized configuration (audio URL, branding)
-│   ├── main.tsx                        # React DOM root & SW update registration
-│   ├── sw.ts                           # Workbox Service Worker with Range Request slicer
-│   └── vite-env.d.ts                   # Vite & PWA type declarations
-├── raw_translations/
-│   └── 1.txt                           # Sample raw text file for build-translation.js
+│   │   ├── DownloadsView.tsx           # Offline manager & batch download
+│   │   ├── BookmarksView.tsx           # Bookmarked Ayahs and Surahs
+│   │   └── SettingsView.tsx            # Theme, language, fonts, credits
+│   ├── sw.ts                           # Workbox Service Worker with Range slicer
+│   ├── App.tsx                         # Main app layout with Suspense lazy loading
+│   └── config.ts                       # App configuration & audio base URL
+├── scripts/
+│   ├── build-manifest.js               # Scans audio directory & creates surahs.json
+│   ├── build-translation.js            # Raw translation text parser
+│   └── download-all-translations.js    # Batch generator for all 114 Surahs
 ├── r2-cors.json                        # Cloudflare R2 CORS configuration
-├── index.html                          # Entry HTML with Amiri & Noto fonts
-├── package.json
-├── tsconfig.json
-└── vite.config.ts                      # Vite + Tailwind + VitePWA config
+├── vercel.json                         # Vercel SPA routing and cache headers
+├── vite.config.ts                      # Vite + Tailwind + VitePWA config
+└── package.json
 ```
 
 ---
 
-## 🛠️ Data Preparation Scripts
+## 🚀 Quick Start (Local Development)
 
-### 1. Audio Manifest Generator (`scripts/build-manifest.js`)
-Scans any local folder of audio files (e.g. `malayalam quran mp3`), calculates byte sizes, matches non-standard prefixes (such as `000_Al_Fattiha.mp3`), and correlates with all 114 canonical Surahs with Arabic and Malayalam titles:
-```bash
-node scripts/build-manifest.js --dir "./malayalam quran mp3" --out "./public/data/surahs.json"
-```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/adhilansari/quran-audio-pwa.git
+   cd quran-audio-pwa
+   ```
 
-### 2. Translation Parser (`scripts/build-translation.js`)
-Takes raw chapter text files where each verse is followed by its Malayalam translation and generates standard JSON `translations/{surahNumber}.json`:
-```bash
-# Convert a single raw file
-node scripts/build-translation.js --file "./raw_translations/1.txt" --surah 1
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-# Or convert an entire directory of text files (e.g. 1.txt to 114.txt)
-node scripts/build-translation.js --input "./raw_translations" --out "./public/data/translations"
-```
+3. **Start the local dev server:**
+   ```bash
+   npm run dev
+   ```
+   Open **[http://localhost:3000](http://localhost:3000)** in your browser.
 
----
-
-## ⚙️ Service Worker & Offline Range Requests (Technical Deep-Dive)
-
-### Why iOS Safari Fails Without Range Requests
-When an HTML5 `<audio>` tag plays media on mobile Safari:
-1. Safari sends an HTTP request with the header `Range: bytes=0-1` to inspect the container header and duration.
-2. When the user seeks or scrubs, Safari issues byte range requests (e.g., `Range: bytes=10485760-`).
-3. Standard Service Worker caches (`caches.match(event.request)`) return an HTTP `200 OK` full body response if stored directly. On iOS Safari, returning a 200 to a Range request causes Safari to refuse seeking, truncate playback, or fail completely.
-
-### How Our Service Worker Solves This:
-In [src/sw.ts](src/sw.ts):
-```ts
-// If client requested a partial range (bytes=start-end)
-if (rangeHeader) {
-  const arrayBuffer = await cachedResponse.arrayBuffer();
-  const total = arrayBuffer.byteLength;
-  const matches = rangeHeader.match(/bytes=(\d*)-(\d*)/);
-  if (matches) {
-    const start = matches[1] ? parseInt(matches[1], 10) : 0;
-    const end = matches[2] ? parseInt(matches[2], 10) : total - 1;
-    const slice = arrayBuffer.slice(start, end + 1);
-
-    return new Response(slice, {
-      status: 206,
-      statusText: 'Partial Content',
-      headers: {
-        'Content-Type': 'audio/mpeg',
-        'Content-Range': `bytes ${start}-${end}/${total}`,
-        'Content-Length': String(slice.byteLength),
-        'Accept-Ranges': 'bytes',
-        'Cache-Control': 'public, max-age=31536000, immutable'
-      }
-    });
-  }
-}
-```
-This synthetic `206 Partial Content` response satisfies iOS Safari, iPadOS, Android Chrome, and Desktop browsers seamlessly.
+4. **Production Build:**
+   ```bash
+   npm run build
+   ```
 
 ---
 
-## ☁️ Deployment Guide (100% Free Tiers)
+## ☁️ Deployment
 
-### 1. Cloudflare R2 Audio Hosting
+### 1. Cloudflare R2 Audio Setup
+1. Create a bucket named `quran-audio-malayalam`.
+2. In bucket **Settings** > **CORS Policy**, paste the contents of `r2-cors.json`.
+3. Enable public access and set the public URL in your app's `VITE_AUDIO_BASE_URL`.
 
-Cloudflare R2 provides **10 GB of free storage and zero egress bandwidth fees** (saving hundreds of dollars compared to AWS S3).
-
-#### Step 1: Create an R2 Bucket
-1. Sign in to your Cloudflare dashboard and go to **R2**.
-2. Click **Create bucket** and name it `quran-audio-malayalam`.
-
-#### Step 2: Upload 114 MP3 Files (~1.31 GB)
-You can upload via Cloudflare Dashboard drag-and-drop, or use **rclone** / **wrangler**:
-
-**Using Wrangler CLI:**
-```bash
-npm install -g wrangler
-wrangler r2 object put quran-audio-malayalam/000_Al_Fattiha.mp3 --file="./malayalam quran mp3/000_Al_Fattiha.mp3"
-```
-
-**Using rclone (Fast batch upload for 1.31 GB):**
-```bash
-# In rclone config, add your Cloudflare R2 S3-compatible credentials
-rclone copy "./malayalam quran mp3" "r2:quran-audio-malayalam/audio" --progress --transfers=8
-```
-
-#### Step 3: Enable Public Access & Custom Domain
-1. In your R2 bucket settings, click **Settings** -> **Public access**.
-2. Either click **Allow Public Access** (gives you a URL like `https://pub-xxxxxx.r2.dev`) OR connect a custom domain like `audio.yourdomain.com`.
-
-#### Step 4: Apply CORS Policy
-In the R2 bucket settings under **CORS Policy**, paste the contents of `r2-cors.json`:
-```json
-[
-  {
-    "AllowedOrigins": ["*"],
-    "AllowedMethods": ["GET", "HEAD", "OPTIONS"],
-    "AllowedHeaders": ["*"],
-    "ExposeHeaders": ["Content-Length", "Content-Range", "Accept-Ranges", "ETag"],
-    "MaxAgeSeconds": 86400
-  }
-]
-```
-
-#### Step 5: Configure the URL in the App
-Edit `src/config.ts`:
-```ts
-audioBaseUrl: "https://pub-xxxxxx.r2.dev/audio" // or your custom domain
-```
-Or set the environment variable:
-```bash
-VITE_AUDIO_BASE_URL="https://pub-xxxxxx.r2.dev/audio"
-```
+### 2. Vercel Deployment
+1. Connect your repository to [Vercel](https://vercel.com).
+2. Set Environment Variable:
+   - `VITE_AUDIO_BASE_URL`: `https://pub-your-id.r2.dev` (or your custom domain)
+3. Deploy! Vercel handles HTTPS, global edge CDN, and atomic zero-downtime builds.
 
 ---
 
-### 2. Deploying the Web App
+## 📜 Credits & License
 
-#### Option A: Deploy to Vercel (Recommended)
-1. Push your repository to GitHub.
-2. Go to [Vercel](https://vercel.com) and click **Add New Project**.
-3. Import your GitHub repository.
-4. Framework Preset: **Vite**.
-5. Build Command: `npm run build`
-6. Output Directory: `dist`
-7. Add Environment Variable:
-   - `VITE_AUDIO_BASE_URL`: `https://pub-xxxxxx.r2.dev/audio`
-8. Click **Deploy**. Vercel automatically assigns HTTPS and high-speed global edge CDN.
-
-#### Option B: Deploy to Cloudflare Pages
-1. Go to **Workers & Pages** in Cloudflare dashboard -> **Create application** -> **Pages**.
-2. Connect your Git repository.
-3. Build preset: **Vite**.
-4. Build command: `npm run build`
-5. Output directory: `dist`
-6. Deploy!
-
-#### Option C: Deploy to GitHub Pages
-If deploying to GitHub Pages under a subpath (e.g. `username.github.io/quran-audio-pwa`):
-1. In `vite.config.ts`, set `base: '/quran-audio-pwa/'`.
-2. Push to branch `gh-pages` or use GitHub Actions.
-
----
-
-## 🧪 Testing Checklist
-
-- [x] **Desktop Chrome / Edge:**
-  - Open app, test instant search across Arabic, English, and Malayalam.
-  - Test audio playback, seek bar scrubbing, ±15s buttons, speed selector.
-  - Test download of Surah 1 (Al-Fatihah), verify offline badge turns green.
-  - Open DevTools -> Network -> toggle "Offline" -> verify downloaded Surah plays and seeks with zero errors.
-- [x] **Android Chrome:**
-  - Tap "Install App" button or three-dot menu -> "Add to Home screen".
-  - Lock the screen during playback -> verify notification bar shows Surah title, Qari name, and lock-screen seek controls.
-- [x] **iOS Safari (iPhone / iPad):**
-  - Open Safari, tap Share -> "Add to Home Screen".
-  - Open installed standalone app -> download Surah -> turn on Airplane Mode.
-  - Test playback and scrub forward/backward to verify HTTP Range request slicing.
-- [x] **Lighthouse Audit:**
-  - Run Lighthouse in Chrome DevTools: PWA badge active, manifest validated, fast TTI, initial JS bundle ~103 KB gzipped.
+- **Reciter:** Mishary Rashid Alafasy / Sheikh Abdul Basit
+- **Malayalam Translation:** Cheriyamundam Abdul Hameed Madani & Kunhi Mohammed Parappoor
+- **Scripture Source:** Tanzil Project & Al-Quran Cloud (Uthmani text)
+- **License:** MIT — Open and free for personal and community use.
