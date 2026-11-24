@@ -27,7 +27,7 @@ export const APP_CONFIG = {
 
   // Storage Keys
   dbName: "QuranMalayalamAudioDB",
-  dbVersion: 1,
+  dbVersion: 2,
 
   // Audio settings defaults
   defaultPlaybackSpeed: 1.0,

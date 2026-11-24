@@ -5,7 +5,7 @@
 
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
 import { APP_CONFIG } from '@/config';
-import { Bookmark, DownloadTask, PlayHistory, AppSettings } from '@/types';
+import { Bookmark, DownloadTask, PlayHistory, AppSettings, Ayah } from '@/types';
 
 interface QuranAudioDB extends DBSchema {
   settings: {
@@ -26,6 +26,14 @@ interface QuranAudioDB extends DBSchema {
     key: number; // surahId
     value: DownloadTask;
     indexes: { 'by-status': string; 'by-updated': number };
+  };
+  translations: {
+    key: number; // surahId
+    value: {
+      surahId: number;
+      ayahs: Ayah[];
+      cachedAt: number;
+    };
   };
 }
 
@@ -58,6 +66,11 @@ export async function getDB(): Promise<IDBPDatabase<QuranAudioDB>> {
           const downloadStore = db.createObjectStore('downloads', { keyPath: 'surahId' });
           downloadStore.createIndex('by-status', 'status');
           downloadStore.createIndex('by-updated', 'updatedAt');
+        }
+
+        // Translations text store (for offline Arabic + Malayalam reading)
+        if (!db.objectStoreNames.contains('translations')) {
+          db.createObjectStore('translations', { keyPath: 'surahId' });
         }
       }
     });
@@ -188,5 +201,29 @@ export async function clearAllDownloadsMeta(): Promise<void> {
     await db.clear('downloads');
   } catch (e) {
     console.error('Error clearing downloads meta:', e);
+  }
+}
+
+// ---------------- Translations Cache API ----------------
+export async function getCachedTranslation(surahId: number): Promise<any | null> {
+  try {
+    const db = await getDB();
+    const entry = await db.get('translations', surahId);
+    return entry ? entry.ayahs : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+export async function saveCachedTranslation(surahId: number, ayahs: any[]): Promise<void> {
+  try {
+    const db = await getDB();
+    await db.put('translations', {
+      surahId,
+      ayahs,
+      cachedAt: Date.now()
+    });
+  } catch (e) {
+    console.error('Error saving translation to cache:', e);
   }
 }

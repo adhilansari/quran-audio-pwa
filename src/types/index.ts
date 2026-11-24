@@ -22,6 +22,7 @@ export interface Ayah {
   ayah: number;
   arabic: string;
   malayalam: string;
+  globalAyahNumber?: number;
 }
 
 export interface AyahTiming {
