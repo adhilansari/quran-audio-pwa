@@ -61,6 +61,10 @@ const translations: Record<UILanguage, Record<string, string>> = {
     themeDark: "എമറാൾഡ് (Dark)",
     themeSepia: "സെപിയ (Sepia)",
     themeMidnight: "മിഡ്നൈറ്റ് (AMOLED)",
+    themeSapphire: "സഫയർ (നീലരാവ്)",
+    themeAmethyst: "അമത്വിസ്റ്റ് (വെൽവെറ്റ്)",
+    themeSage: "സേജ് (ഇളം പച്ച)",
+    themeRose: "റോസ് (മദീന പുലരി)",
     builtBy: "നിർമ്മാണം (Developed by)",
     supportProject: "സഹായിക്കുക (Support)",
     portfolio: "പോർട്ട്ഫോളിയോ",
@@ -127,6 +131,10 @@ const translations: Record<UILanguage, Record<string, string>> = {
     themeDark: "Emerald Dark",
     themeSepia: "Sepia (Warm)",
     themeMidnight: "Midnight (AMOLED)",
+    themeSapphire: "Sapphire Night",
+    themeAmethyst: "Royal Amethyst",
+    themeSage: "Sage Oasis",
+    themeRose: "Madinah Rose",
     builtBy: "Built by",
     supportProject: "Buy Me a Coffee",
     portfolio: "Portfolio",
@@ -184,21 +192,18 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Sync theme to DOM
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove('dark', 'sepia', 'midnight', 'light');
+    root.classList.remove('dark', 'sepia', 'midnight', 'sapphire', 'amethyst', 'sage', 'rose', 'light');
 
     let activeTheme = settings.theme;
     if (activeTheme === 'system') {
       activeTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
 
-    if (activeTheme === 'dark') {
-      root.classList.add('dark');
-    } else if (activeTheme === 'sepia') {
-      root.classList.add('sepia');
-    } else if (activeTheme === 'midnight') {
-      root.classList.add('dark', 'midnight');
+    const darkThemes = ['dark', 'midnight', 'sapphire', 'amethyst'];
+    if (darkThemes.includes(activeTheme)) {
+      root.classList.add('dark', activeTheme);
     } else {
-      root.classList.add('light');
+      root.classList.add('light', activeTheme);
     }
   }, [settings.theme]);
 

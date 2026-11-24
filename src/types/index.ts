@@ -69,7 +69,16 @@ export interface ReadingHistoryItem {
   readAt: number;
 }
 
-export type ThemeMode = 'system' | 'light' | 'dark' | 'sepia' | 'midnight';
+export type ThemeMode =
+  | 'system'
+  | 'light'
+  | 'dark'
+  | 'sepia'
+  | 'midnight'
+  | 'sapphire'
+  | 'amethyst'
+  | 'sage'
+  | 'rose';
 export type UILanguage = 'ml' | 'en';
 export type RepeatMode = 'off' | 'surah' | 'all';
 

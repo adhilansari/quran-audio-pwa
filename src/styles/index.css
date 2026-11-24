@@ -94,6 +94,90 @@ html.midnight nav {
   border-color: #1a1e22 !important;
 }
 
+/* Theme Styles: Celestial Sapphire Night Sky */
+html.sapphire,
+html.sapphire body {
+  background-color: #070d18 !important;
+  color: #e2e8f0 !important;
+}
+
+html.sapphire .bg-white,
+html.sapphire .dark\:bg-\[\#12201c\],
+html.sapphire .bg-\[\#faf8f5\] {
+  background-color: #0d1726 !important;
+  border-color: #1e293b !important;
+  color: #f1f5f9 !important;
+}
+
+html.sapphire header,
+html.sapphire nav {
+  background-color: rgba(7, 13, 24, 0.96) !important;
+  border-color: #1e293b !important;
+}
+
+/* Theme Styles: Mystic Amethyst / Royal Velvet */
+html.amethyst,
+html.amethyst body {
+  background-color: #0e0915 !important;
+  color: #f3e8ff !important;
+}
+
+html.amethyst .bg-white,
+html.amethyst .dark\:bg-\[\#12201c\],
+html.amethyst .bg-\[\#faf8f5\] {
+  background-color: #181024 !important;
+  border-color: #2e1a42 !important;
+  color: #f3e8ff !important;
+}
+
+html.amethyst header,
+html.amethyst nav {
+  background-color: rgba(14, 9, 21, 0.96) !important;
+  border-color: #2e1a42 !important;
+}
+
+/* Theme Styles: Olive Sage Oasis (Gentle Light) */
+html.sage,
+html.sage body {
+  background-color: #f3f7f4 !important;
+  color: #213326 !important;
+}
+
+html.sage .bg-white,
+html.sage .dark\:bg-\[\#12201c\],
+html.sage .bg-\[\#faf8f5\] {
+  background-color: #fbfdfb !important;
+  border-color: #cfe0d3 !important;
+  color: #213326 !important;
+}
+
+html.sage header,
+html.sage nav {
+  background-color: rgba(243, 247, 244, 0.96) !important;
+  border-color: #cfe0d3 !important;
+}
+
+/* Theme Styles: Rose Dawn / Madinah Sunrise (Soft Warm Light) */
+html.rose,
+html.rose body {
+  background-color: #fdf6f7 !important;
+  color: #3d2428 !important;
+}
+
+html.rose .bg-white,
+html.rose .dark\:bg-\[\#12201c\],
+html.rose .bg-\[\#faf8f5\] {
+  background-color: #fffbfa !important;
+  border-color: #edd5d8 !important;
+  color: #3d2428 !important;
+}
+
+html.rose header,
+html.rose nav {
+  background-color: rgba(253, 246, 247, 0.96) !important;
+  border-color: #edd5d8 !important;
+}
+
 /* Islamic arabesque subtle geometric background */
 .bg-islamic-pattern {
   background-color: #064e3b;
@@ -107,6 +191,12 @@ html.midnight nav {
   background-image: radial-gradient(#b45309 0.75px, transparent 0.75px), radial-gradient(#b45309 0.75px, #062e24 0.75px);
   background-size: 30px 30px;
   background-position: 0 0, 15px 15px;
+}
+
+/* Subtle Watermark Islamic Geometric Star Lattice */
+.bg-islamic-stars {
+  background-image: radial-gradient(circle at 50% 50%, rgba(217, 119, 6, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
 /* Smooth range scrubber styling */

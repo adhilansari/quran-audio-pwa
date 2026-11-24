@@ -68,14 +68,38 @@ export const Navbar: React.FC<NavbarProps> = () => {
     {
       id: 'sepia',
       labelMl: 'സെപിയ (വായന)',
-      labelEn: 'Sepia (Reading)',
+      labelEn: 'Sepia (Warm)',
       icon: <span className="text-sm">📜</span>
     },
     {
       id: 'midnight',
       labelMl: 'AMOLED ബ്ലാക്ക്',
-      labelEn: 'AMOLED Midnight',
+      labelEn: 'Midnight (AMOLED)',
       icon: <span className="text-sm">🖤</span>
+    },
+    {
+      id: 'sapphire',
+      labelMl: 'സഫയർ (നീലരാവ്)',
+      labelEn: 'Sapphire (Navy)',
+      icon: <span className="text-sm">🌌</span>
+    },
+    {
+      id: 'amethyst',
+      labelMl: 'അമത്വിസ്റ്റ് (റോയൽ)',
+      labelEn: 'Royal Velvet',
+      icon: <span className="text-sm">🔮</span>
+    },
+    {
+      id: 'sage',
+      labelMl: 'സേജ് (ഇളം പച്ച)',
+      labelEn: 'Sage Oasis',
+      icon: <span className="text-sm">🌿</span>
+    },
+    {
+      id: 'rose',
+      labelMl: 'റോസ് (മദീന പുലരി)',
+      labelEn: 'Madinah Rose',
+      icon: <span className="text-sm">🌸</span>
     },
     {
       id: 'system',
@@ -154,6 +178,14 @@ export const Navbar: React.FC<NavbarProps> = () => {
                 <span className="text-xs">📜</span>
               ) : settings.theme === 'midnight' ? (
                 <span className="text-xs">🖤</span>
+              ) : settings.theme === 'sapphire' ? (
+                <span className="text-xs">🌌</span>
+              ) : settings.theme === 'amethyst' ? (
+                <span className="text-xs">🔮</span>
+              ) : settings.theme === 'sage' ? (
+                <span className="text-xs">🌿</span>
+              ) : settings.theme === 'rose' ? (
+                <span className="text-xs">🌸</span>
               ) : settings.theme === 'system' ? (
                 <span className="text-xs">⚙️</span>
               ) : (

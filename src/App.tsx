@@ -49,8 +49,16 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('quran:next-surah', handleNext);
   }, [surahs, nextSurah]);
 
-  // Check URL on startup for deep links (e.g. ?surah=2&ayah=255)
+  // Check URL on startup for deep links (e.g. ?surah=2&ayah=255) and hash tab (#surahs, etc.)
   useEffect(() => {
+    const validTabs: NavTab[] = ['home', 'surahs', 'downloads', 'bookmarks', 'settings'];
+    const hash = window.location.hash.replace('#', '') as NavTab;
+    const initialTab: NavTab = validTabs.includes(hash) ? hash : 'home';
+
+    if (validTabs.includes(hash)) {
+      setCurrentTab(hash);
+    }
+
     const params = new URLSearchParams(window.location.search);
     const surahParam = params.get('surah');
     if (surahParam) {
@@ -60,22 +68,36 @@ export const App: React.FC = () => {
         const ayahParam = params.get('ayah');
         const initialAyah = ayahParam ? parseInt(ayahParam, 10) : undefined;
         setReaderTarget({ surah: target, initialAyah });
-        window.history.replaceState({ view: 'reader', surahId: target.id, initialAyah }, '', window.location.search);
+        window.history.replaceState({ view: 'reader', surahId: target.id, initialAyah, tab: initialTab }, '', window.location.href);
       }
+    } else {
+      window.history.replaceState({ tab: initialTab }, '', window.location.hash || `#${initialTab}`);
     }
   }, [surahs]);
 
   // Handle native mobile back button navigation via Popstate API
   useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
+      const validTabs: NavTab[] = ['home', 'surahs', 'downloads', 'bookmarks', 'settings'];
+
       if (e.state && e.state.view === 'reader') {
         const surah = surahs.find(s => s.id === e.state.surahId);
         if (surah) {
           setReaderTarget({ surah, initialAyah: e.state.initialAyah });
         }
       } else {
-        // Hardware/gesture back pressed -> Close Reader and go back to main page without closing app!
+        // Hardware/gesture back pressed -> Close Reader if open
         setReaderTarget(null);
+
+        // Update tab according to history state or current hash
+        const stateTab = e.state?.tab as NavTab;
+        const hashTab = window.location.hash.replace('#', '') as NavTab;
+        const targetTab = validTabs.includes(stateTab)
+          ? stateTab
+          : validTabs.includes(hashTab)
+          ? hashTab
+          : 'home';
+        setCurrentTab(targetTab);
       }
     };
 
@@ -83,10 +105,22 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [surahs]);
 
+  const handleTabChange = (tab: NavTab) => {
+    if (tab === currentTab && !readerTarget) return;
+
+    if (readerTarget) {
+      setReaderTarget(null);
+    }
+
+    setCurrentTab(tab);
+    window.history.pushState({ tab }, '', `#${tab}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleOpenReader = (surah: Surah, initialAyah?: number) => {
     setReaderTarget({ surah, initialAyah });
-    const newUrl = initialAyah ? `?surah=${surah.id}&ayah=${initialAyah}` : `?surah=${surah.id}`;
-    window.history.pushState({ view: 'reader', surahId: surah.id, initialAyah }, '', newUrl);
+    const query = initialAyah ? `?surah=${surah.id}&ayah=${initialAyah}` : `?surah=${surah.id}`;
+    window.history.pushState({ view: 'reader', surahId: surah.id, initialAyah, tab: currentTab }, '', `${query}#${currentTab}`);
   };
 
   const handleBackFromReader = () => {
@@ -94,14 +128,12 @@ export const App: React.FC = () => {
       window.history.back();
     } else {
       setReaderTarget(null);
-      if (window.location.search) {
-        window.history.replaceState(null, '', window.location.pathname);
-      }
+      window.history.replaceState({ tab: currentTab }, '', `#${currentTab}`);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] dark:bg-[#0b1411] text-stone-900 dark:text-stone-100 flex flex-col selection:bg-emerald-600 selection:text-white">
+    <div className="min-h-screen bg-[#faf8f5] dark:bg-[#0b1411] bg-islamic-stars text-stone-900 dark:text-stone-100 flex flex-col selection:bg-emerald-600 selection:text-white transition-colors duration-200">
       {/* Top Main Navbar (Only visible on main pages, hidden on Reader page) */}
       {!readerTarget && <Navbar />}
 
@@ -128,13 +160,13 @@ export const App: React.FC = () => {
               onBack={handleBackFromReader}
             />
           ) : (
-            <>
+            <div key={currentTab} className="animate-in fade-in duration-150">
               {currentTab === 'home' && (
                 <HomeView
                   surahs={surahs}
-                  onSelectSurah={(s) => setReaderTarget({ surah: s })}
+                  onSelectSurah={(s) => handleOpenReader(s)}
                   onOpenReader={handleOpenReader}
-                  onNavigateTab={(t) => setCurrentTab(t)}
+                  onNavigateTab={handleTabChange}
                 />
               )}
 
@@ -151,7 +183,7 @@ export const App: React.FC = () => {
               )}
 
               {currentTab === 'settings' && <SettingsView />}
-            </>
+            </div>
           )}
         </Suspense>
       </main>
@@ -166,10 +198,7 @@ export const App: React.FC = () => {
       {!readerTarget && (
         <BottomNav
           currentTab={currentTab}
-          onTabChange={(tab) => {
-            setCurrentTab(tab);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
+          onTabChange={handleTabChange}
           activeDownloadsCount={activeDownloadsCount}
         />
       )}

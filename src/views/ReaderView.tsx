@@ -364,6 +364,37 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber
     }, 2000);
   };
 
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      // Detect swipe-from-left edge (within 35px from screen left)
+      if (touch.clientX <= 35) {
+        touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+      }
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    const touch = e.changedTouches[0];
+    const deltaX = touch.clientX - touchStartRef.current.x;
+    const deltaY = Math.abs(touch.clientY - touchStartRef.current.y);
+    touchStartRef.current = null;
+
+    // Significant rightward swipe from edge
+    if (deltaX > 65 && deltaY < 55) {
+      if ('vibrate' in navigator) navigator.vibrate(10);
+      onBack();
+    }
+  };
+
+  const handleBackWithHaptic = () => {
+    if ('vibrate' in navigator) navigator.vibrate(8);
+    onBack();
+  };
+
   const isCurrentSurahPlaying = currentSurah?.id === surah.id && isPlaying;
   const isCurrentSurahLoading = currentSurah?.id === surah.id && isChapterAudioLoading;
 
@@ -371,12 +402,16 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber
   const hasMore = visibleCount < ayahs.length;
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] dark:bg-[#0b1411] text-stone-900 dark:text-stone-100 pb-36 animate-in fade-in duration-200">
+    <div
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      className="min-h-screen bg-[#faf8f5] dark:bg-[#0b1411] bg-islamic-stars text-stone-900 dark:text-stone-100 pb-36 animate-in fade-in duration-200"
+    >
       {/* Sticky Reader Navigation Bar */}
       <div className="sticky top-0 z-20 bg-[#faf8f5]/95 dark:bg-[#0b1411]/95 backdrop-blur-md border-b border-stone-200 dark:border-emerald-950 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
-            onClick={onBack}
+            onClick={handleBackWithHaptic}
             className="p-1.5 -ml-1.5 rounded-lg text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-emerald-950 transition-colors"
             title="Back to list"
           >
@@ -910,25 +945,29 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber
                 <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                 <span>{settings.language === 'ml' ? 'തീം (Themes)' : 'Theme'}</span>
               </label>
-              <div className="grid grid-cols-5 gap-1.5">
+              <div className="grid grid-cols-3 gap-1.5">
                 {[
                   { id: 'light', label: settings.language === 'ml' ? 'ലൈറ്റ്' : 'Light', icon: '☀️' },
-                  { id: 'dark', label: settings.language === 'ml' ? 'ഡാർക്ക്' : 'Dark', icon: '🌙' },
+                  { id: 'dark', label: settings.language === 'ml' ? 'മരതകം' : 'Emerald', icon: '🌙' },
                   { id: 'sepia', label: settings.language === 'ml' ? 'സെപിയ' : 'Sepia', icon: '📜' },
                   { id: 'midnight', label: 'AMOLED', icon: '🖤' },
+                  { id: 'sapphire', label: 'Sapphire', icon: '🌌' },
+                  { id: 'amethyst', label: 'Amethyst', icon: '🔮' },
+                  { id: 'sage', label: 'Sage', icon: '🌿' },
+                  { id: 'rose', label: 'Rose', icon: '🌸' },
                   { id: 'system', label: settings.language === 'ml' ? 'സിസ്റ്റം' : 'Auto', icon: '⚙️' }
                 ].map((th) => (
                   <button
                     key={th.id}
                     onClick={() => updateSetting('theme', th.id as ThemeMode)}
-                    className={`py-1.5 px-1 rounded-xl text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 border transition-all ${
+                    className={`py-2 px-1 rounded-xl text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 border transition-all ${
                       settings.theme === th.id
-                        ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs'
-                        : 'bg-stone-50 dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-300'
+                        ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs scale-102 font-extrabold'
+                        : 'bg-stone-50 dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-300 hover:bg-stone-100'
                     }`}
                   >
-                    <span>{th.icon}</span>
-                    <span className="truncate max-w-[50px]">{th.label}</span>
+                    <span className="text-sm">{th.icon}</span>
+                    <span className="truncate max-w-[65px]">{th.label}</span>
                   </button>
                 ))}
               </div>

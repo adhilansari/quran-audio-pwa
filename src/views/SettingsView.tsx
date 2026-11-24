@@ -28,7 +28,11 @@ export const SettingsView: React.FC = () => {
     { id: 'light', label: t('themeLight'), icon: <Sun className="w-3.5 h-3.5 text-amber-500" /> },
     { id: 'dark', label: t('themeDark'), icon: <Moon className="w-3.5 h-3.5 text-emerald-400" /> },
     { id: 'sepia', label: t('themeSepia'), icon: <span className="text-xs">📜</span> },
-    { id: 'midnight', label: t('themeMidnight'), icon: <span className="text-xs">🖤</span> }
+    { id: 'midnight', label: t('themeMidnight'), icon: <span className="text-xs">🖤</span> },
+    { id: 'sapphire', label: t('themeSapphire'), icon: <span className="text-xs">🌌</span> },
+    { id: 'amethyst', label: t('themeAmethyst'), icon: <span className="text-xs">🔮</span> },
+    { id: 'sage', label: t('themeSage'), icon: <span className="text-xs">🌿</span> },
+    { id: 'rose', label: t('themeRose'), icon: <span className="text-xs">🌸</span> }
   ];
 
   const languages: { id: UILanguage; label: string }[] = [
@@ -44,7 +48,7 @@ export const SettingsView: React.FC = () => {
           <Sparkles className="w-4 h-4 text-amber-500" />
           <span>{t('theme')}</span>
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {themes.map(th => (
             <button
               key={th.id}

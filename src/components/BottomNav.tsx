@@ -38,16 +38,23 @@ export const BottomNav: React.FC<BottomNavProps> = ({
     { id: 'settings', label: t('settings'), icon: <Settings className="w-5 h-5" /> }
   ];
 
+  const handleTabClick = (tabId: NavTab) => {
+    if ('vibrate' in navigator) {
+      navigator.vibrate(8);
+    }
+    onTabChange(tabId);
+  };
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 bg-[#faf8f5]/95 dark:bg-[#0b1411]/95 backdrop-blur-lg border-t border-stone-200/80 dark:border-emerald-950/80 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2">
+    <nav className="fixed bottom-0 left-0 right-0 z-30 bg-[#faf8f5]/95 dark:bg-[#0b1411]/95 backdrop-blur-lg border-t border-stone-200/80 dark:border-emerald-950/80 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 transition-colors">
       <div className="max-w-md mx-auto grid grid-cols-5 gap-1 px-2">
         {tabs.map(tab => {
           const isActive = currentTab === tab.id;
           return (
             <button
               key={tab.id}
-              onClick={() => onTabChange(tab.id)}
-              className={`flex flex-col items-center justify-center py-1 rounded-xl transition-all ${
+              onClick={() => handleTabClick(tab.id)}
+              className={`flex flex-col items-center justify-center py-1 rounded-xl transition-all active:scale-95 ${
                 isActive
                   ? 'text-emerald-700 dark:text-amber-400 font-bold scale-105'
                   : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'
