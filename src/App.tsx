@@ -49,22 +49,65 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('quran:next-surah', handleNext);
   }, [surahs, nextSurah]);
 
+  // Check URL on startup for deep links (e.g. ?surah=2&ayah=255)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const surahParam = params.get('surah');
+    if (surahParam) {
+      const sId = parseInt(surahParam, 10);
+      const target = surahs.find(s => s.id === sId);
+      if (target) {
+        const ayahParam = params.get('ayah');
+        const initialAyah = ayahParam ? parseInt(ayahParam, 10) : undefined;
+        setReaderTarget({ surah: target, initialAyah });
+        window.history.replaceState({ view: 'reader', surahId: target.id, initialAyah }, '', window.location.search);
+      }
+    }
+  }, [surahs]);
+
+  // Handle native mobile back button navigation via Popstate API
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      if (e.state && e.state.view === 'reader') {
+        const surah = surahs.find(s => s.id === e.state.surahId);
+        if (surah) {
+          setReaderTarget({ surah, initialAyah: e.state.initialAyah });
+        }
+      } else {
+        // Hardware/gesture back pressed -> Close Reader and go back to main page without closing app!
+        setReaderTarget(null);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [surahs]);
+
   const handleOpenReader = (surah: Surah, initialAyah?: number) => {
     setReaderTarget({ surah, initialAyah });
+    const newUrl = initialAyah ? `?surah=${surah.id}&ayah=${initialAyah}` : `?surah=${surah.id}`;
+    window.history.pushState({ view: 'reader', surahId: surah.id, initialAyah }, '', newUrl);
   };
 
   const handleBackFromReader = () => {
-    setReaderTarget(null);
+    if (window.history.state && window.history.state.view === 'reader') {
+      window.history.back();
+    } else {
+      setReaderTarget(null);
+      if (window.location.search) {
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    }
   };
 
   return (
     <div className="min-h-screen bg-[#faf8f5] dark:bg-[#0b1411] text-stone-900 dark:text-stone-100 flex flex-col selection:bg-emerald-600 selection:text-white">
-      {/* Top Navbar */}
-      <Navbar />
+      {/* Top Main Navbar (Only visible on main pages, hidden on Reader page) */}
+      {!readerTarget && <Navbar />}
 
       {/* Playback Error Alert Toast */}
       {errorMessage && (
-        <div className="sticky top-[61px] z-40 bg-rose-600 text-white px-4 py-2.5 text-xs font-medium flex items-center justify-between shadow-md">
+        <div className="sticky top-0 z-40 bg-rose-600 text-white px-4 py-2.5 text-xs font-medium flex items-center justify-between shadow-md">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span>{errorMessage}</span>
@@ -76,7 +119,7 @@ export const App: React.FC = () => {
       )}
 
       {/* Main Content Area with Suspense Lazy Loading */}
-      <main className="flex-1 max-w-2xl w-full mx-auto px-4 py-4 pb-32">
+      <main className={`flex-1 w-full mx-auto ${readerTarget ? 'p-0 max-w-full' : 'max-w-2xl px-4 py-4 pb-32'}`}>
         <Suspense fallback={<PageLoader />}>
           {readerTarget ? (
             <ReaderView
