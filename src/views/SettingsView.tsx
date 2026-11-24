@@ -11,7 +11,6 @@ import {
   CheckCircle2,
   Heart,
   ExternalLink,
-  Coffee,
   Sparkles,
   BookOpen
 } from 'lucide-react';
@@ -209,7 +208,7 @@ export const SettingsView: React.FC = () => {
           For bug reports, questions, feedback, or further project updates:
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
+        <div className="pt-0.5">
           <a
             href={APP_CONFIG.credits.developerUrl}
             target="_blank"
@@ -218,15 +217,6 @@ export const SettingsView: React.FC = () => {
           >
             <ExternalLink className="w-3.5 h-3.5 text-emerald-600 dark:text-amber-400" />
             <span>adhilansari.vercel.app</span>
-          </a>
-          <a
-            href={APP_CONFIG.credits.coffeeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-amber-400 text-emerald-950 hover:bg-amber-300 transition-all shadow-xs"
-          >
-            <Coffee className="w-3.5 h-3.5" />
-            <span>Buy Me a Coffee ☕</span>
           </a>
         </div>
       </div>

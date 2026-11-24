@@ -16,124 +16,129 @@ async function generateOgImage() {
 <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <!-- Background Gradient -->
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="og-bg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#06382b" />
       <stop offset="50%" stop-color="#042018" />
       <stop offset="100%" stop-color="#02110c" />
     </linearGradient>
 
-    <!-- Golden Accent Gradient -->
+    <!-- Logo Background Gradient -->
+    <linearGradient id="logo-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b" />
+      <stop offset="100%" stop-color="#022c22" />
+    </linearGradient>
+
+    <!-- Golden Gradient -->
     <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#fef08a" />
-      <stop offset="50%" stop-color="#fbbf24" />
+      <stop offset="0%" stop-color="#fde68a" />
+      <stop offset="50%" stop-color="#f59e0b" />
       <stop offset="100%" stop-color="#d97706" />
     </linearGradient>
 
-    <!-- Card Glow Gradient -->
-    <radialGradient id="glow" cx="50%" cy="30%" r="60%">
-      <stop offset="0%" stop-color="#10b981" stop-opacity="0.25" />
+    <!-- Center Radial Glow -->
+    <radialGradient id="og-glow" cx="50%" cy="32%" r="55%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.22" />
       <stop offset="100%" stop-color="#042018" stop-opacity="0" />
     </radialGradient>
 
-    <!-- Drop Shadow Filter -->
-    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000000" flood-opacity="0.6" />
+    <!-- Logo Shadow -->
+    <filter id="logo-shadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#000000" flood-opacity="0.65" />
     </filter>
   </defs>
 
-  <!-- Background Base -->
-  <rect width="${width}" height="${height}" fill="url(#bg)" />
-  <rect width="${width}" height="${height}" fill="url(#glow)" />
+  <!-- Canvas Background -->
+  <rect width="${width}" height="${height}" fill="url(#og-bg)" />
+  <rect width="${width}" height="${height}" fill="url(#og-glow)" />
 
-  <!-- Subtle Islamic Geometric Pattern Grid -->
-  <g opacity="0.06" stroke="#fbbf24" stroke-width="1.5">
+  <!-- Subtle Islamic Geometric Background Pattern -->
+  <g opacity="0.05" stroke="#fbbf24" stroke-width="1.5">
     <circle cx="600" cy="315" r="280" fill="none" />
-    <circle cx="600" cy="315" r="200" fill="none" />
-    <circle cx="600" cy="315" r="120" fill="none" />
-    <polygon points="600,75 770,245 770,385 600,555 430,385 430,245" fill="none" />
-    <polygon points="600,115 740,255 740,375 600,515 460,375 460,255" fill="none" />
+    <circle cx="600" cy="315" r="190" fill="none" />
+    <circle cx="600" cy="315" r="110" fill="none" />
+    <polygon points="600,65 780,245 780,385 600,565 420,385 420,245" fill="none" />
+    <polygon points="600,105 740,245 740,385 600,525 460,385 460,245" fill="none" />
   </g>
 
-  <!-- Subtle Border Frame -->
-  <rect x="24" y="24" width="1152" height="582" rx="28" fill="none" stroke="url(#gold)" stroke-width="2" opacity="0.4" />
-  <rect x="36" y="36" width="1128" height="558" rx="20" fill="none" stroke="#10b981" stroke-width="1" opacity="0.25" />
+  <!-- Elegant Golden Border Frame -->
+  <rect x="28" y="28" width="1144" height="574" rx="28" fill="none" stroke="url(#gold)" stroke-width="2" opacity="0.45" />
+  <rect x="40" y="40" width="1120" height="550" rx="20" fill="none" stroke="#10b981" stroke-width="1" opacity="0.2" />
 
-  <!-- Corner Islamic Ornaments -->
-  <circle cx="50" cy="50" r="6" fill="#fbbf24" opacity="0.7" />
-  <circle cx="1150" cy="50" r="6" fill="#fbbf24" opacity="0.7" />
-  <circle cx="50" cy="580" r="6" fill="#fbbf24" opacity="0.7" />
-  <circle cx="1150" cy="580" r="6" fill="#fbbf24" opacity="0.7" />
+  <!-- Corner Dots -->
+  <circle cx="56" cy="56" r="5" fill="#fbbf24" opacity="0.8" />
+  <circle cx="1144" cy="56" r="5" fill="#fbbf24" opacity="0.8" />
+  <circle cx="56" cy="574" r="5" fill="#fbbf24" opacity="0.8" />
+  <circle cx="1144" cy="574" r="5" fill="#fbbf24" opacity="0.8" />
 
-  <!-- Quran Logo Icon Box with Shadow -->
-  <g filter="url(#shadow)" transform="translate(536, 68)">
-    <rect width="128" height="128" rx="32" fill="url(#gold)" />
-    <!-- Book symbol in inner box -->
-    <path d="M38 42 C 48 38, 58 38, 64 44 C 70 38, 80 38, 90 42 L 90 88 C 80 84, 70 84, 64 90 C 58 84, 48 84, 38 88 Z" fill="#064e3b" />
-    <line x1="64" y1="44" x2="64" y2="90" stroke="#fbbf24" stroke-width="2.5" />
+  <!-- OFFICIAL APP LOGO (Centered at top) -->
+  <g filter="url(#logo-shadow)" transform="translate(515, 62) scale(0.332)">
+    <!-- Background rounded squircle -->
+    <rect width="512" height="512" rx="112" fill="url(#logo-bg)" stroke="url(#gold)" stroke-width="12" />
+
+    <!-- Islamic 8-point geometric star pattern behind Quran -->
+    <g opacity="0.18" stroke="url(#gold)" stroke-width="4" fill="none">
+      <rect x="156" y="156" width="200" height="200" rx="20" />
+      <rect x="156" y="156" width="200" height="200" rx="20" transform="rotate(45 256 256)" />
+      <circle cx="256" cy="256" r="140" />
+    </g>
+
+    <!-- Decorative Outer Ring -->
+    <circle cx="256" cy="256" r="216" stroke="url(#gold)" stroke-width="3" stroke-dasharray="8 6" opacity="0.4" fill="none" />
+
+    <!-- Open Book Pages -->
+    <path d="M 120 300 Q 190 260 256 280 Q 322 260 392 300 L 392 180 Q 322 140 256 160 Q 190 140 120 180 Z" fill="#faf8f5" />
+    
+    <!-- Gold Ribbon / Bookmark in center -->
+    <path d="M 252 160 L 260 160 L 260 340 L 256 332 L 252 340 Z" fill="url(#gold)" />
+
+    <!-- Quran Arabic Scripture lines decorative -->
+    <line x1="150" y1="200" x2="230" y2="185" stroke="#065f46" stroke-width="4" stroke-linecap="round" opacity="0.75" />
+    <line x1="145" y1="225" x2="235" y2="210" stroke="#065f46" stroke-width="4" stroke-linecap="round" opacity="0.75" />
+    <line x1="155" y1="250" x2="225" y2="238" stroke="#065f46" stroke-width="4" stroke-linecap="round" opacity="0.75" />
+
+    <line x1="282" y1="185" x2="362" y2="200" stroke="#065f46" stroke-width="4" stroke-linecap="round" opacity="0.75" />
+    <line x1="277" y1="210" x2="367" y2="225" stroke="#065f46" stroke-width="4" stroke-linecap="round" opacity="0.75" />
+    <line x1="287" y1="238" x2="357" y2="250" stroke="#065f46" stroke-width="4" stroke-linecap="round" opacity="0.75" />
+
+    <!-- Sound waves / Headphones arching over Quran -->
+    <path d="M 160 140 A 130 130 0 0 1 352 140" fill="none" stroke="url(#gold)" stroke-width="12" stroke-linecap="round" />
+    <path d="M 185 155 A 95 95 0 0 1 327 155" fill="none" stroke="url(#gold)" stroke-width="7" stroke-linecap="round" opacity="0.85" />
+
+    <!-- Play symbol in gold badge at bottom -->
+    <circle cx="256" cy="390" r="38" fill="url(#gold)" />
+    <polygon points="250,374 270,390 250,406" fill="#064e3b" />
   </g>
 
-  <!-- Main Malayalam Title -->
-  <text x="600" y="255" text-anchor="middle" font-family="Noto Sans Malayalam, sans-serif" font-size="44" font-weight="bold" fill="#ffffff" letter-spacing="0.5">
-    ഖുർആൻ മലയാളം ഓഡിയോ
+  <!-- Main Malayalam Title: App instead of PWA -->
+  <text x="600" y="290" text-anchor="middle" font-family="Noto Sans Malayalam, sans-serif" font-size="46" font-weight="bold" fill="#ffffff" letter-spacing="0.5">
+    ഖുർആൻ മലയാളം ഓഡിയോ ആപ്പ്
   </text>
 
   <!-- English Title -->
-  <text x="600" y="305" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="28" font-weight="700" fill="#fbbf24" letter-spacing="1">
-    Quran Malayalam Audio &amp; Player PWA
+  <text x="600" y="342" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="30" font-weight="700" fill="#fbbf24" letter-spacing="1">
+    Quran Malayalam Audio App
   </text>
 
-  <!-- Subtitle / Tagline -->
-  <text x="600" y="355" text-anchor="middle" font-family="Noto Sans Malayalam, Plus Jakarta Sans, sans-serif" font-size="19" font-weight="500" fill="#a7f3d0">
-    പൂർണ്ണ 114 സൂറത്തുകൾ • ആയത്ത് പാരായണം • മലയാള പരിഭാഷ • 100% ഓഫ്‌ലൈൻ
+  <!-- Clear, Meaningful Features Description -->
+  <text x="600" y="398" text-anchor="middle" font-family="Noto Sans Malayalam, Plus Jakarta Sans, sans-serif" font-size="22" font-weight="600" fill="#a7f3d0">
+    സമ്പൂർണ്ണ 114 സൂറത്തുകൾ • ആയത്ത് തിലാവത്ത് • മലയാള പരിഭാഷ
   </text>
 
-  <!-- Feature Pills Badges -->
-  <g transform="translate(160, 400)">
-    <!-- Pill 1 -->
-    <g transform="translate(0, 0)">
-      <rect width="195" height="48" rx="24" fill="#064e3b" stroke="#10b981" stroke-width="1.5" opacity="0.9" />
-      <text x="97" y="30" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="600" fill="#fef08a">
-        🎙️ മിഷാരി അൽ അഫാസി
-      </text>
-    </g>
+  <text x="600" y="438" text-anchor="middle" font-family="Noto Sans Malayalam, Plus Jakarta Sans, sans-serif" font-size="17" font-weight="500" fill="#6ee7b7" opacity="0.9">
+    പരസ്യരഹിതം • മൊബൈൽ ഫോണുകളിലും കമ്പ്യൂട്ടറുകളിലും ഉപയോഗിക്കാൻ എളുപ്പമുള്ള ആപ്പ്
+  </text>
 
-    <!-- Pill 2 -->
-    <g transform="translate(225, 0)">
-      <rect width="215" height="48" rx="24" fill="#064e3b" stroke="#10b981" stroke-width="1.5" opacity="0.9" />
-      <text x="107" y="30" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="600" fill="#fef08a">
-        📖 ആയത്ത് തിലാവത്ത്
-      </text>
-    </g>
-
-    <!-- Pill 3 -->
-    <g transform="translate(470, 0)">
-      <rect width="195" height="48" rx="24" fill="#064e3b" stroke="#10b981" stroke-width="1.5" opacity="0.9" />
-      <text x="97" y="30" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="600" fill="#fef08a">
-        📶 ഓഫ്‌ലൈൻ പ്ലെയർ
-      </text>
-    </g>
-
-    <!-- Pill 4 -->
-    <g transform="translate(695, 0)">
-      <rect width="185" height="48" rx="24" fill="#064e3b" stroke="#10b981" stroke-width="1.5" opacity="0.9" />
-      <text x="92" y="30" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="600" fill="#fef08a">
-        ⚡ 100% സൗജന്യം
-      </text>
-    </g>
-  </g>
-
-  <!-- Footer Info Line -->
-  <g transform="translate(600, 520)">
-    <!-- URL Button Badge -->
-    <rect x="-160" y="-18" width="320" height="38" rx="19" fill="#022c22" stroke="#fbbf24" stroke-width="1" />
-    <text x="0" y="6" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="16" font-weight="700" fill="#fbbf24">
-      🌐 mlquran.vercel.app
+  <!-- URL Button Badge (Clean & Centered) -->
+  <g transform="translate(600, 508)">
+    <rect x="-175" y="-22" width="350" height="44" rx="22" fill="#022c22" stroke="url(#gold)" stroke-width="1.5" />
+    <text x="0" y="7" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="18" font-weight="700" fill="#fbbf24">
+      🌐 https://mlquran.vercel.app/
     </text>
   </g>
 
-  <!-- Developer Signature -->
-  <text x="600" y="565" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="13" font-weight="500" fill="#6ee7b7" opacity="0.8">
-    Crafted with ❤️ by Adhil Ansari • Progressive Web App (PWA)
+  <!-- Clean Tagline at bottom -->
+  <text x="600" y="568" text-anchor="middle" font-family="Noto Sans Malayalam, Plus Jakarta Sans, sans-serif" font-size="14" font-weight="500" fill="#34d399" opacity="0.85">
+    വിശുദ്ധ ഖുർആൻ കേൾക്കാനും വായിക്കാനും പഠിക്കാനും ഒരു ലളിതമായ ആപ്പ്
   </text>
 </svg>
 `;
@@ -148,11 +153,11 @@ async function generateOgImage() {
     .toFile(pngPath);
   console.log(`Generated OG Image (PNG): ${pngPath}`);
 
-  // Generate JPG version for maximum compatibility
+  // Generate JPG version
   const jpgPath = path.resolve(publicDir, 'og-image.jpg');
   await sharp(svgBuffer)
     .resize(width, height)
-    .jpeg({ quality: 90, mozjpeg: true })
+    .jpeg({ quality: 92, mozjpeg: true })
     .toFile(jpgPath);
   console.log(`Generated OG Image (JPG): ${jpgPath}`);
 }
