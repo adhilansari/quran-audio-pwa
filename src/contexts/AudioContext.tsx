@@ -446,27 +446,33 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     // Auto advance to next surah if setting is enabled
     if (autoPlayNextRef.current && currentSurahRef.current.id < 114) {
-      window.dispatchEvent(new CustomEvent('quran:next-surah'));
+      window.dispatchEvent(
+        new CustomEvent('quran:next-surah', {
+          detail: { currentId: currentSurahRef.current.id }
+        })
+      );
     } else {
       pause();
     }
   };
 
-  const nextSurah = (surahs: Surah[]) => {
-    if (!currentSurah) return;
-    const currentIndex = surahs.findIndex(s => s.id === currentSurah.id);
-    if (currentIndex >= 0 && currentIndex < surahs.length - 1) {
-      playSurah(surahs[currentIndex + 1]);
-    } else if (repeatMode === 'all' && surahs.length > 0) {
-      playSurah(surahs[0]);
+  const nextSurah = (surahsList: Surah[]) => {
+    const active = currentSurahRef.current || currentSurah;
+    if (!active) return;
+    const currentIndex = surahsList.findIndex(s => s.id === active.id);
+    if (currentIndex >= 0 && currentIndex < surahsList.length - 1) {
+      playSurah(surahsList[currentIndex + 1]);
+    } else if (repeatModeRef.current === 'all' && surahsList.length > 0) {
+      playSurah(surahsList[0]);
     }
   };
 
-  const prevSurah = (surahs: Surah[]) => {
-    if (!currentSurah) return;
-    const currentIndex = surahs.findIndex(s => s.id === currentSurah.id);
+  const prevSurah = (surahsList: Surah[]) => {
+    const active = currentSurahRef.current || currentSurah;
+    if (!active) return;
+    const currentIndex = surahsList.findIndex(s => s.id === active.id);
     if (currentIndex > 0) {
-      playSurah(surahs[currentIndex - 1]);
+      playSurah(surahsList[currentIndex - 1]);
     }
   };
 

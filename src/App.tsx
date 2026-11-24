@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { Surah } from '@/types';
 import surahsData from '@/data/surahs.json';
 import { Navbar } from '@/components/Navbar';
@@ -26,11 +26,28 @@ const PageLoader = () => (
 
 export const App: React.FC = () => {
   const surahs = surahsData as Surah[];
-  const { currentSurah, errorMessage, clearError, nextSurah } = useAudio();
+  const { currentSurah, errorMessage, clearError, nextSurah, playSurah } = useAudio();
 
   const [currentTab, setCurrentTab] = useState<NavTab>('home');
   const [readerTarget, setReaderTarget] = useState<{ surah: Surah; initialAyah?: number } | null>(null);
   const [activeDownloadsCount, setActiveDownloadsCount] = useState(0);
+
+  // Keep fresh references to avoid stale closure during auto-advance
+  const currentSurahRef = useRef(currentSurah);
+  const readerTargetRef = useRef(readerTarget);
+  const currentTabRef = useRef(currentTab);
+
+  useEffect(() => {
+    currentSurahRef.current = currentSurah;
+  }, [currentSurah]);
+
+  useEffect(() => {
+    readerTargetRef.current = readerTarget;
+  }, [readerTarget]);
+
+  useEffect(() => {
+    currentTabRef.current = currentTab;
+  }, [currentTab]);
 
   // Monitor active downloads count for badge
   useEffect(() => {
@@ -40,32 +57,36 @@ export const App: React.FC = () => {
     return () => unsub();
   }, [surahs]);
 
-  // Listen for custom auto-next event
+  // Listen for custom auto-next event (smooth audio + reader auto-advance)
   useEffect(() => {
-    const handleNext = () => {
-      const activeId = currentSurah?.id ?? readerTarget?.surah.id;
-      if (activeId) {
-        const currentIndex = surahs.findIndex(s => s.id === activeId);
-        if (currentIndex >= 0 && currentIndex < surahs.length - 1) {
-          const next = surahs[currentIndex + 1];
-          nextSurah(surahs);
-          if (readerTarget) {
-            setReaderTarget({ surah: next });
-            window.history.replaceState(
-              { view: 'reader', surahId: next.id, tab: currentTab },
-              '',
-              `?surah=${next.id}#${currentTab}`
-            );
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }
-          return;
+    const handleNext = (e?: Event) => {
+      const customEvent = e as CustomEvent<{ currentId?: number }>;
+      const finishedId =
+        customEvent?.detail?.currentId ??
+        currentSurahRef.current?.id ??
+        readerTargetRef.current?.surah.id;
+
+      if (!finishedId) return;
+
+      const currentIndex = surahs.findIndex(s => s.id === finishedId);
+      if (currentIndex >= 0 && currentIndex < surahs.length - 1) {
+        const next = surahs[currentIndex + 1];
+        playSurah(next);
+        if (readerTargetRef.current) {
+          setReaderTarget({ surah: next });
+          window.history.replaceState(
+            { view: 'reader', surahId: next.id, tab: currentTabRef.current },
+            '',
+            `?surah=${next.id}#${currentTabRef.current}`
+          );
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         }
       }
-      nextSurah(surahs);
     };
+
     window.addEventListener('quran:next-surah', handleNext);
     return () => window.removeEventListener('quran:next-surah', handleNext);
-  }, [surahs, nextSurah, currentSurah, readerTarget, currentTab]);
+  }, [surahs, playSurah]);
 
   // Check URL on startup for deep links (e.g. ?surah=2&ayah=255) and hash tab (#surahs, etc.)
   useEffect(() => {
@@ -208,7 +229,7 @@ export const App: React.FC = () => {
       </main>
 
       {/* Sticky Mini Player (visible if a surah is active and not inside full player) */}
-      <MiniPlayer />
+      <MiniPlayer hasBottomNav={!readerTarget} />
 
       {/* Full-screen Player Sheet / Modal */}
       <FullPlayer surahs={surahs} onOpenReader={handleOpenReader} />

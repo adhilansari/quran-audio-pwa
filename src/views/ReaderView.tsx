@@ -52,8 +52,6 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
     currentSurah,
     isPlaying,
     isLoading: isChapterAudioLoading,
-    currentAyahNumber,
-    activeTimings,
     playSurah,
     togglePlay
   } = useAudio();
@@ -338,6 +336,17 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
       // Check if reached very bottom of chapter
       if (docHeight - scrollBottom <= 2 && visibleCount >= ayahs.length) {
         setIsAutoScrolling(false);
+        if (settings.autoPlayNext && surah.id < 114) {
+          const allSurahs = surahsData as Surah[];
+          const next = allSurahs.find(s => s.id === surah.id + 1);
+          if (next && onSelectSurah) {
+            onSelectSurah(next);
+            if (isCurrentSurahPlaying) {
+              playSurah(next);
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }
         return;
       }
 
@@ -747,8 +756,6 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
         ) : (
           <>
             {visibleAyahs.map((ayah) => {
-              const isHighlight =
-                currentSurah?.id === surah.id && currentAyahNumber === ayah.ayah;
               const isSaved = bookmarkedMap[ayah.ayah];
               const isPlayingThisAyah = playingAyahNum === ayah.ayah;
               const isCopied = copiedAyah === ayah.ayah;
@@ -761,7 +768,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                     else ayahRefs.current.delete(ayah.ayah);
                   }}
                   className={`rounded-2xl p-4 transition-all duration-300 border ${
-                    isHighlight
+                    isPlayingThisAyah
                       ? 'bg-amber-50 dark:bg-emerald-950/80 border-amber-400 dark:border-amber-400/80 shadow-md ring-2 ring-amber-400/20'
                       : jumpedAyah === ayah.ayah
                       ? 'bg-amber-50/70 dark:bg-emerald-950/90 border-amber-500 ring-4 ring-amber-400/40 shadow-xl scale-[1.01]'
@@ -772,7 +779,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                   <div className="flex items-center justify-between pb-2 mb-2 border-b border-stone-100 dark:border-emerald-950">
                     <div className="flex items-center gap-2">
                       <span className={`w-6 h-6 rounded-full font-bold text-xs flex items-center justify-center ${
-                        jumpedAyah === ayah.ayah
+                        isPlayingThisAyah || jumpedAyah === ayah.ayah
                           ? 'bg-amber-400 text-emerald-950 font-black'
                           : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-amber-300'
                       }`}>
@@ -780,7 +787,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                       </span>
                       {jumpedAyah === ayah.ayah && (
                         <span className="text-[10px] font-bold tracking-wider text-amber-500 animate-pulse">
-                          വായിച്ച ഭാഗം (Resumed)
+                          {settings.language === 'ml' ? 'വായിച്ച ഭാഗം' : 'Resumed'}
                         </span>
                       )}
                     </div>
@@ -975,8 +982,8 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
           ballPos
             ? { left: `${ballPos.x}px`, top: `${ballPos.y}px`, right: 'auto', bottom: 'auto' }
             : currentSurah
-            ? { bottom: '125px' }
-            : { bottom: '80px' }
+            ? { bottom: '80px' }
+            : { bottom: '24px' }
         }
         className={`fixed right-3 sm:right-5 z-40 select-none transition-opacity duration-300 touch-none cursor-grab active:cursor-grabbing ${
           isFaded ? 'opacity-35 hover:opacity-100 scale-90' : 'opacity-100 scale-100'

@@ -3,7 +3,11 @@ import { Play, Pause, RotateCcw, RotateCw, Maximize2, Loader2 } from 'lucide-rea
 import { useAudio } from '@/contexts/AudioContext';
 import { useSettings } from '@/contexts/SettingsContext';
 
-export const MiniPlayer: React.FC = () => {
+interface MiniPlayerProps {
+  hasBottomNav?: boolean;
+}
+
+export const MiniPlayer: React.FC<MiniPlayerProps> = ({ hasBottomNav = true }) => {
   const {
     currentSurah,
     isPlaying,
@@ -12,18 +16,23 @@ export const MiniPlayer: React.FC = () => {
     duration,
     togglePlay,
     seekRelative,
-    openFullPlayer
+    openFullPlayer,
+    isFullPlayerOpen
   } = useAudio();
   const { settings } = useSettings();
 
-  if (!currentSurah) return null;
+  if (!currentSurah || isFullPlayerOpen) return null;
 
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
     <div
       onClick={openFullPlayer}
-      className="fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] left-2 right-2 sm:left-4 sm:right-4 max-w-2xl sm:mx-auto z-20 bg-emerald-900/95 dark:bg-[#12201c]/95 text-stone-100 rounded-2xl shadow-xl shadow-emerald-950/30 backdrop-blur-md border border-emerald-700/50 dark:border-emerald-800/40 cursor-pointer overflow-hidden transition-all hover:bg-emerald-900 dark:hover:bg-[#12201c]"
+      className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] max-w-2xl z-40 bg-emerald-900/95 dark:bg-[#12201c]/95 text-stone-100 rounded-2xl shadow-2xl shadow-black/40 backdrop-blur-md border border-emerald-700/60 dark:border-emerald-800/60 cursor-pointer overflow-hidden transition-all hover:bg-emerald-900 dark:hover:bg-[#12201c] ${
+        hasBottomNav
+          ? 'bottom-[calc(4.5rem+env(safe-area-inset-bottom))]'
+          : 'bottom-[calc(0.75rem+env(safe-area-inset-bottom))]'
+      }`}
     >
       {/* Top micro progress bar */}
       <div className="w-full bg-emerald-950/60 h-1">
