@@ -69,6 +69,27 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [sleepRemainingSeconds, setSleepRemainingSeconds] = useState<number | null>(null);
   const sleepIntervalRef = useRef<any>(null);
 
+  const sleepTimerMinutesRef = useRef<number | null>(null);
+  const repeatModeRef = useRef<RepeatMode>('off');
+  const currentSurahRef = useRef<Surah | null>(null);
+  const autoPlayNextRef = useRef<boolean>(true);
+
+  useEffect(() => {
+    sleepTimerMinutesRef.current = sleepTimerMinutes;
+  }, [sleepTimerMinutes]);
+
+  useEffect(() => {
+    repeatModeRef.current = repeatMode;
+  }, [repeatMode]);
+
+  useEffect(() => {
+    currentSurahRef.current = currentSurah;
+  }, [currentSurah]);
+
+  useEffect(() => {
+    autoPlayNextRef.current = settings.autoPlayNext;
+  }, [settings.autoPlayNext]);
+
   // Initialize HTML5 Audio once and preserve across lifecycle
   useEffect(() => {
     const audio = new Audio();
@@ -406,24 +427,25 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const handleAudioEnded = () => {
-    if (!audioRef.current || !currentSurah) return;
+    if (!audioRef.current || !currentSurahRef.current) return;
 
     // Check repeat mode
-    if (repeatMode === 'surah') {
+    if (repeatModeRef.current === 'surah') {
       audioRef.current.currentTime = 0;
       audioRef.current.play();
       return;
     }
 
-    // Check sleep timer 'end_of_surah'
-    if (sleepTimerMinutes === -1) {
+    // Check sleep timer 'end_of_surah' (-1)
+    if (sleepTimerMinutesRef.current === -1) {
       setSleepTimer(null);
       pause();
+      if ('vibrate' in navigator) navigator.vibrate([15, 60, 15]);
       return;
     }
 
     // Auto advance to next surah if setting is enabled
-    if (settings.autoPlayNext && currentSurah.id < 114) {
+    if (autoPlayNextRef.current && currentSurahRef.current.id < 114) {
       window.dispatchEvent(new CustomEvent('quran:next-surah'));
     } else {
       pause();
@@ -448,7 +470,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  // Sleep timer interval
+  // Sleep timer interval with reliable auto-pause and haptics
   const setSleepTimer = (minutes: number | null) => {
     setSleepTimerMinutesState(minutes);
     if (sleepIntervalRef.current) {
@@ -467,7 +489,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       return;
     }
 
-    const totalSeconds = minutes * 60;
+    const totalSeconds = Math.round(minutes * 60);
     setSleepRemainingSeconds(totalSeconds);
 
     let remaining = totalSeconds;
@@ -475,11 +497,20 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       remaining -= 1;
       setSleepRemainingSeconds(remaining);
       if (remaining <= 0) {
-        clearInterval(sleepIntervalRef.current);
-        sleepIntervalRef.current = null;
+        if (sleepIntervalRef.current) {
+          clearInterval(sleepIntervalRef.current);
+          sleepIntervalRef.current = null;
+        }
         setSleepTimerMinutesState(null);
         setSleepRemainingSeconds(null);
-        pause();
+        if (audioRef.current) {
+          audioRef.current.pause();
+        }
+        setIsPlaying(false);
+        setIsLoading(false);
+        if ('vibrate' in navigator) {
+          navigator.vibrate([25, 70, 25]);
+        }
       }
     }, 1000);
   };

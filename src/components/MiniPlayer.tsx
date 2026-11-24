@@ -61,8 +61,11 @@ export const MiniPlayer: React.FC = () => {
         >
           {/* -15s Seek */}
           <button
-            onClick={() => seekRelative(-15)}
-            className="p-1.5 text-emerald-200 hover:text-amber-300 transition-colors"
+            onClick={() => {
+              if ('vibrate' in navigator) navigator.vibrate(8);
+              seekRelative(-15);
+            }}
+            className="p-1.5 text-emerald-200 hover:text-amber-300 transition-colors active:scale-90"
             title="Rewind 15 seconds"
           >
             <RotateCcw className="w-4 h-4" />
@@ -70,7 +73,10 @@ export const MiniPlayer: React.FC = () => {
 
           {/* Play / Pause Primary Button */}
           <button
-            onClick={togglePlay}
+            onClick={() => {
+              if ('vibrate' in navigator) navigator.vibrate(12);
+              togglePlay();
+            }}
             className="w-10 h-10 rounded-full bg-amber-400 text-emerald-950 flex items-center justify-center shadow-md hover:bg-amber-300 active:scale-95 transition-all"
             title={isLoading ? 'Loading...' : isPlaying ? 'Pause' : 'Play'}
           >
@@ -85,8 +91,11 @@ export const MiniPlayer: React.FC = () => {
 
           {/* +15s Seek */}
           <button
-            onClick={() => seekRelative(15)}
-            className="p-1.5 text-emerald-200 hover:text-amber-300 transition-colors"
+            onClick={() => {
+              if ('vibrate' in navigator) navigator.vibrate(8);
+              seekRelative(15);
+            }}
+            className="p-1.5 text-emerald-200 hover:text-amber-300 transition-colors active:scale-90"
             title="Forward 15 seconds"
           >
             <RotateCw className="w-4 h-4" />

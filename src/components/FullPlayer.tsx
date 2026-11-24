@@ -50,6 +50,11 @@ export const FullPlayer: React.FC<FullPlayerProps> = ({ surahs, onOpenReader }) 
   const { settings, t } = useSettings();
   const [showSleepModal, setShowSleepModal] = useState(false);
   const [showSpeedModal, setShowSpeedModal] = useState(false);
+  const [customMinutes, setCustomMinutes] = useState(25);
+
+  const triggerHaptic = (ms = 10) => {
+    if ('vibrate' in navigator) navigator.vibrate(ms);
+  };
 
   if (!isFullPlayerOpen || !currentSurah) return null;
 
@@ -161,7 +166,10 @@ export const FullPlayer: React.FC<FullPlayerProps> = ({ surahs, onOpenReader }) 
         <div className="flex items-center justify-between my-2">
           {/* Previous Surah */}
           <button
-            onClick={() => prevSurah(surahs)}
+            onClick={() => {
+              triggerHaptic(10);
+              prevSurah(surahs);
+            }}
             className="p-3 text-stone-300 hover:text-white transition-transform active:scale-90"
             title="Previous Surah"
           >
@@ -170,7 +178,10 @@ export const FullPlayer: React.FC<FullPlayerProps> = ({ surahs, onOpenReader }) 
 
           {/* -15s Seek */}
           <button
-            onClick={() => seekRelative(-15)}
+            onClick={() => {
+              triggerHaptic(8);
+              seekRelative(-15);
+            }}
             className="p-3 text-emerald-200 hover:text-amber-300 transition-transform active:scale-90"
             title="Rewind 15 seconds"
           >
@@ -179,7 +190,10 @@ export const FullPlayer: React.FC<FullPlayerProps> = ({ surahs, onOpenReader }) 
 
           {/* Large Center Play / Pause Gold Button */}
           <button
-            onClick={togglePlay}
+            onClick={() => {
+              triggerHaptic(15);
+              togglePlay();
+            }}
             className="w-18 h-18 rounded-full bg-gradient-to-tr from-amber-500 to-amber-300 text-emerald-950 flex items-center justify-center shadow-xl shadow-amber-500/20 hover:scale-105 active:scale-95 transition-all"
             title={isLoading ? 'Loading...' : isPlaying ? 'Pause' : 'Play'}
           >
@@ -194,7 +208,10 @@ export const FullPlayer: React.FC<FullPlayerProps> = ({ surahs, onOpenReader }) 
 
           {/* +15s Seek */}
           <button
-            onClick={() => seekRelative(15)}
+            onClick={() => {
+              triggerHaptic(8);
+              seekRelative(15);
+            }}
             className="p-3 text-emerald-200 hover:text-amber-300 transition-transform active:scale-90"
             title="Forward 15 seconds"
           >
@@ -203,7 +220,10 @@ export const FullPlayer: React.FC<FullPlayerProps> = ({ surahs, onOpenReader }) 
 
           {/* Next Surah */}
           <button
-            onClick={() => nextSurah(surahs)}
+            onClick={() => {
+              triggerHaptic(10);
+              nextSurah(surahs);
+            }}
             className="p-3 text-stone-300 hover:text-white transition-transform active:scale-90"
             title="Next Surah"
           >
@@ -264,30 +284,67 @@ export const FullPlayer: React.FC<FullPlayerProps> = ({ surahs, onOpenReader }) 
             <h3 className="text-base font-bold text-amber-300 mb-3 flex items-center gap-2">
               <Clock className="w-5 h-5" /> {t('sleepTimer')}
             </h3>
-            <div className="space-y-1.5 mb-4">
+            <div className="space-y-1.5 mb-3 max-h-[40vh] overflow-y-auto no-scrollbar">
               {[
                 { min: null, label: t('sleepOff') },
                 { min: 15, label: t('sleep15') },
                 { min: 30, label: t('sleep30') },
                 { min: 45, label: t('sleep45') },
                 { min: 60, label: t('sleep60') },
+                { min: 90, label: settings.language === 'ml' ? '90 മിനിറ്റ് (1.5 മണിക്കൂർ)' : '90 Minutes' },
                 { min: -1, label: t('sleepEndOfSurah') }
               ].map(opt => (
                 <button
                   key={String(opt.min)}
                   onClick={() => {
+                    triggerHaptic(12);
                     setSleepTimer(opt.min);
                     setShowSleepModal(false);
                   }}
-                  className={`w-full py-2.5 px-3 rounded-xl text-left text-sm font-medium transition-all ${
+                  className={`w-full py-2.5 px-3 rounded-xl text-left text-xs font-semibold transition-all ${
                     sleepTimerMinutes === opt.min
-                      ? 'bg-emerald-700 text-amber-300 font-bold'
+                      ? 'bg-emerald-700 text-amber-300 font-bold shadow-xs'
                       : 'hover:bg-emerald-900/60 text-stone-200'
                   }`}
                 >
                   {opt.label}
                 </button>
               ))}
+            </div>
+
+            {/* Custom Sleep Timer Slider / Selector */}
+            <div className="pt-3 border-t border-emerald-900/60 space-y-2 mb-3">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-emerald-200 font-medium">
+                  {settings.language === 'ml' ? 'കസ്റ്റം സമയം (Custom):' : 'Custom Duration:'}
+                </span>
+                <span className="font-bold text-amber-300">
+                  {customMinutes} {settings.language === 'ml' ? 'മിനിറ്റ്' : 'min'}
+                </span>
+              </div>
+              <input
+                type="range"
+                min={1}
+                max={180}
+                value={customMinutes}
+                onChange={(e) => {
+                  triggerHaptic(5);
+                  setCustomMinutes(parseInt(e.target.value, 10));
+                }}
+                className="w-full h-1.5 bg-emerald-950 rounded-lg appearance-none cursor-pointer"
+              />
+              <button
+                onClick={() => {
+                  triggerHaptic(14);
+                  setSleepTimer(customMinutes);
+                  setShowSleepModal(false);
+                }}
+                className="w-full py-2 rounded-xl bg-amber-400 text-emerald-950 font-bold text-xs shadow-xs hover:bg-amber-300 transition-colors"
+              >
+                {settings.language === 'ml'
+                  ? `${customMinutes} മിനിറ്റ് ടൈമർ ഓൺ ചെയ്യുക`
+                  : `Start ${customMinutes} Min Timer`}
+              </button>
             </div>
             <button
               onClick={() => setShowSleepModal(false)}

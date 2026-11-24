@@ -324,8 +324,8 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
       const delta = (now - lastTime) / 1000;
       lastTime = now;
 
-      // Base 32 pixels/second * multiplier (0.5x, 1x, 1.5x, 2x, 3x)
-      const pixelsToScroll = Math.max(0.5, autoScrollSpeed * 32 * delta);
+      // Base 30 pixels/second * multiplier (supports 0.1x, 0.2x, 0.5x, 1x, etc.)
+      const pixelsToScroll = Math.max(0.04, autoScrollSpeed * 30 * delta);
       window.scrollBy(0, pixelsToScroll);
 
       // Expand visibleCount progressively before hitting bottom
@@ -583,50 +583,89 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
       {showTypographyControls && (
         <div className="bg-stone-100 dark:bg-[#12201c] border-b border-stone-200 dark:border-emerald-950 px-4 py-3 animate-in slide-in-from-top-2 duration-150">
           <div className="max-w-2xl mx-auto space-y-3">
-            {/* Arabic Font Size Slider */}
+            {/* Arabic Font Presets */}
             <div>
-              <div className="flex justify-between text-xs font-semibold text-stone-600 dark:text-stone-300 mb-1">
+              <div className="flex justify-between text-xs font-semibold text-stone-600 dark:text-stone-300 mb-1.5">
                 <span>{t('arabicSize')}</span>
-                <span>{settings.arabicFontSize}px</span>
+                <span className="font-bold text-emerald-700 dark:text-amber-400">
+                  {settings.arabicFontSize <= 24 ? (settings.language === 'ml' ? 'ചെറുത്' : 'Small') :
+                   settings.arabicFontSize <= 28 ? (settings.language === 'ml' ? 'സാധാരണം' : 'Normal') :
+                   settings.arabicFontSize <= 32 ? (settings.language === 'ml' ? 'ഇടത്തരം' : 'Medium') :
+                   settings.arabicFontSize <= 36 ? (settings.language === 'ml' ? 'വലുത്' : 'Large') :
+                   (settings.language === 'ml' ? 'വളരെ വലുത്' : 'Huge')}
+                </span>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-xs font-bold text-stone-500">A-</span>
-                <input
-                  type="range"
-                  min={22}
-                  max={42}
-                  value={settings.arabicFontSize}
-                  onChange={(e) => updateSetting('arabicFontSize', parseInt(e.target.value, 10))}
-                  className="w-full h-1.5 bg-stone-300 dark:bg-emerald-950 rounded-lg appearance-none cursor-pointer"
-                />
-                <span className="text-base font-bold text-stone-800 dark:text-stone-100">A+</span>
+              <div className="grid grid-cols-5 gap-1.5">
+                {[
+                  { size: 24, labelMl: 'ചെറുത്', labelEn: 'Small' },
+                  { size: 28, labelMl: 'സാധാരണം', labelEn: 'Normal' },
+                  { size: 32, labelMl: 'ഇടത്തരം', labelEn: 'Medium' },
+                  { size: 36, labelMl: 'വലുത്', labelEn: 'Large' },
+                  { size: 42, labelMl: 'കൂടുതൽ', labelEn: 'Huge' }
+                ].map(opt => (
+                  <button
+                    key={opt.size}
+                    onClick={() => {
+                      if ('vibrate' in navigator) navigator.vibrate(8);
+                      updateSetting('arabicFontSize', opt.size);
+                    }}
+                    className={`py-1.5 px-1 rounded-xl text-center text-xs font-bold transition-all border ${
+                      settings.arabicFontSize === opt.size
+                        ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs scale-102'
+                        : 'bg-white dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-300 hover:bg-stone-50'
+                    }`}
+                  >
+                    {settings.language === 'ml' ? opt.labelMl : opt.labelEn}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Malayalam Font Size Slider */}
+            {/* Malayalam Font Presets */}
             <div>
-              <div className="flex justify-between text-xs font-semibold text-stone-600 dark:text-stone-300 mb-1">
+              <div className="flex justify-between text-xs font-semibold text-stone-600 dark:text-stone-300 mb-1.5">
                 <span>{t('malayalamSize')}</span>
-                <span>{settings.malayalamFontSize}px</span>
+                <span className="font-bold text-emerald-700 dark:text-amber-400">
+                  {settings.malayalamFontSize <= 14 ? (settings.language === 'ml' ? 'ചെറുത്' : 'Small') :
+                   settings.malayalamFontSize <= 16 ? (settings.language === 'ml' ? 'സാധാരണം' : 'Normal') :
+                   settings.malayalamFontSize <= 18 ? (settings.language === 'ml' ? 'ഇടത്തരം' : 'Medium') :
+                   settings.malayalamFontSize <= 20 ? (settings.language === 'ml' ? 'വലുത്' : 'Large') :
+                   (settings.language === 'ml' ? 'വളരെ വലുത്' : 'Huge')}
+                </span>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-xs font-bold text-stone-500">A-</span>
-                <input
-                  type="range"
-                  min={13}
-                  max={24}
-                  value={settings.malayalamFontSize}
-                  onChange={(e) => updateSetting('malayalamFontSize', parseInt(e.target.value, 10))}
-                  className="w-full h-1.5 bg-stone-300 dark:bg-emerald-950 rounded-lg appearance-none cursor-pointer"
-                />
-                <span className="text-base font-bold text-stone-800 dark:text-stone-100">A+</span>
+              <div className="grid grid-cols-5 gap-1.5">
+                {[
+                  { size: 14, labelMl: 'ചെറുത്', labelEn: 'Small' },
+                  { size: 16, labelMl: 'സാധാരണം', labelEn: 'Normal' },
+                  { size: 18, labelMl: 'ഇടത്തരം', labelEn: 'Medium' },
+                  { size: 20, labelMl: 'വലുത്', labelEn: 'Large' },
+                  { size: 22, labelMl: 'കൂടുതൽ', labelEn: 'Huge' }
+                ].map(opt => (
+                  <button
+                    key={opt.size}
+                    onClick={() => {
+                      if ('vibrate' in navigator) navigator.vibrate(8);
+                      updateSetting('malayalamFontSize', opt.size);
+                    }}
+                    className={`py-1.5 px-1 rounded-xl text-center text-xs font-bold transition-all border ${
+                      settings.malayalamFontSize === opt.size
+                        ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs scale-102'
+                        : 'bg-white dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-300 hover:bg-stone-50'
+                    }`}
+                  >
+                    {settings.language === 'ml' ? opt.labelMl : opt.labelEn}
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* View Toggles */}
             <div className="flex items-center justify-between pt-2 border-t border-stone-200 dark:border-emerald-900/60 text-xs">
               <button
-                onClick={() => updateSetting('showArabic', !settings.showArabic)}
+                onClick={() => {
+                  if ('vibrate' in navigator) navigator.vibrate(8);
+                  updateSetting('showArabic', !settings.showArabic);
+                }}
                 className="flex items-center gap-1.5 text-stone-700 dark:text-stone-300 font-medium"
               >
                 {settings.showArabic ? <Eye className="w-3.5 h-3.5 text-emerald-600" /> : <EyeOff className="w-3.5 h-3.5 text-stone-400" />}
@@ -634,7 +673,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
               </button>
 
               <button
-                onClick={() => updateSetting('showMalayalam', !settings.showMalayalam)}
+                onClick={() => {
+                  if ('vibrate' in navigator) navigator.vibrate(8);
+                  updateSetting('showMalayalam', !settings.showMalayalam);
+                }}
                 className="flex items-center gap-1.5 text-stone-700 dark:text-stone-300 font-medium"
               >
                 {settings.showMalayalam ? <Eye className="w-3.5 h-3.5 text-emerald-600" /> : <EyeOff className="w-3.5 h-3.5 text-stone-400" />}
@@ -874,20 +916,26 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
       {isAutoScrolling && (
         <div className="fixed right-2.5 sm:right-4 top-1/2 -translate-y-1/2 z-40 bg-emerald-950/90 text-white backdrop-blur-md rounded-2xl py-2 px-1 border border-amber-400/50 shadow-2xl flex flex-col items-center gap-1.5 animate-in slide-in-from-right-3 duration-200">
           <button
-            onClick={() => setAutoScrollSpeed(prev => Math.min(3.0, +(prev + 0.25).toFixed(2)))}
-            className="w-6 h-6 rounded-lg bg-emerald-900/80 hover:bg-emerald-800 text-amber-300 flex items-center justify-center font-black text-xs transition-colors"
+            onClick={() => {
+              if ('vibrate' in navigator) navigator.vibrate(8);
+              setAutoScrollSpeed(prev => +(Math.min(3.0, prev < 0.5 ? prev + 0.1 : prev + 0.25)).toFixed(2));
+            }}
+            className="w-6 h-6 rounded-lg bg-emerald-900/80 hover:bg-emerald-800 text-amber-300 flex items-center justify-center font-black text-xs transition-colors active:scale-95"
             title="Speed up scroll"
           >
             +
           </button>
 
           <span className="text-[10px] font-black text-amber-300 py-0.5 tracking-tighter">
-            {autoScrollSpeed}x
+            {autoScrollSpeed.toFixed(1)}x
           </span>
 
           <button
-            onClick={() => setAutoScrollSpeed(prev => Math.max(0.5, +(prev - 0.25).toFixed(2)))}
-            className="w-6 h-6 rounded-lg bg-emerald-900/80 hover:bg-emerald-800 text-amber-300 flex items-center justify-center font-black text-xs transition-colors"
+            onClick={() => {
+              if ('vibrate' in navigator) navigator.vibrate(8);
+              setAutoScrollSpeed(prev => +(Math.max(0.1, prev <= 0.5 ? prev - 0.1 : prev - 0.25)).toFixed(2));
+            }}
+            className="w-6 h-6 rounded-lg bg-emerald-900/80 hover:bg-emerald-800 text-amber-300 flex items-center justify-center font-black text-xs transition-colors active:scale-95"
             title="Slow down scroll"
           >
             -
@@ -1011,11 +1059,14 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                   {settings.language === 'ml' ? 'വേഗത:' : 'Speed:'}
                 </span>
                 <div className="flex items-center gap-1">
-                  {[0.5, 1.0, 1.5, 2.0, 3.0].map((spd) => (
+                  {[0.1, 0.2, 0.5, 1.0, 1.5, 2.0].map((spd) => (
                     <button
                       key={spd}
-                      onClick={() => setAutoScrollSpeed(spd)}
-                      className={`px-2 py-0.5 rounded-lg font-bold text-xs transition-all ${
+                      onClick={() => {
+                        if ('vibrate' in navigator) navigator.vibrate(8);
+                        setAutoScrollSpeed(spd);
+                      }}
+                      className={`px-2 py-0.5 rounded-lg font-bold text-xs transition-all active:scale-95 ${
                         autoScrollSpeed === spd
                           ? 'bg-emerald-800 text-amber-300 shadow-xs'
                           : 'bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 text-stone-700 dark:text-stone-300'
@@ -1050,8 +1101,11 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                 ].map((th) => (
                   <button
                     key={th.id}
-                    onClick={() => updateSetting('theme', th.id as ThemeMode)}
-                    className={`py-2 px-1 rounded-xl text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 border transition-all ${
+                    onClick={() => {
+                      if ('vibrate' in navigator) navigator.vibrate(8);
+                      updateSetting('theme', th.id as ThemeMode);
+                    }}
+                    className={`py-2 px-1 rounded-xl text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 border transition-all active:scale-95 ${
                       settings.theme === th.id
                         ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs scale-102 font-extrabold'
                         : 'bg-stone-50 dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-300 hover:bg-stone-100'
@@ -1064,47 +1118,77 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
               </div>
             </div>
 
-            {/* 3. Typography Adjustments */}
-            <div className="space-y-2.5 pt-1">
-              {/* Arabic Font Slider */}
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-semibold text-stone-700 dark:text-stone-300">
-                  {settings.language === 'ml' ? 'അറബിക് ഫോണ്ട്' : 'Arabic Font'}: {settings.arabicFontSize}px
-                </span>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => updateSetting('arabicFontSize', Math.max(20, settings.arabicFontSize - 2))}
-                    className="w-7 h-7 rounded-lg bg-stone-100 dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 font-bold flex items-center justify-center text-xs"
-                  >
-                    -
-                  </button>
-                  <button
-                    onClick={() => updateSetting('arabicFontSize', Math.min(44, settings.arabicFontSize + 2))}
-                    className="w-7 h-7 rounded-lg bg-stone-100 dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 font-bold flex items-center justify-center text-xs"
-                  >
-                    +
-                  </button>
+            {/* 3. Typography Adjustments (Discrete Named Sizes) */}
+            <div className="space-y-3 pt-1">
+              {/* Arabic Font Options */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-stone-700 dark:text-stone-300">
+                    {settings.language === 'ml' ? 'അറബിക് ഫോണ്ട്' : 'Arabic Font'}
+                  </span>
+                  <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400">
+                    {settings.arabicFontSize}px
+                  </span>
+                </div>
+                <div className="grid grid-cols-5 gap-1">
+                  {[
+                    { label: settings.language === 'ml' ? 'ചെറുത്' : 'Small', val: 24 },
+                    { label: settings.language === 'ml' ? 'സാധാരണം' : 'Normal', val: 28 },
+                    { label: settings.language === 'ml' ? 'ഇടത്തരം' : 'Medium', val: 32 },
+                    { label: settings.language === 'ml' ? 'വലുത്' : 'Large', val: 36 },
+                    { label: settings.language === 'ml' ? 'കൂടുതൽ' : 'Huge', val: 42 }
+                  ].map((size) => (
+                    <button
+                      key={size.val}
+                      onClick={() => {
+                        if ('vibrate' in navigator) navigator.vibrate(8);
+                        updateSetting('arabicFontSize', size.val);
+                      }}
+                      className={`py-1.5 px-0.5 rounded-lg text-center border font-bold text-[10px] transition-all active:scale-95 ${
+                        settings.arabicFontSize === size.val
+                          ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs'
+                          : 'bg-stone-50 dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100'
+                      }`}
+                    >
+                      {size.label}
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              {/* Malayalam Font Slider */}
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-semibold text-stone-700 dark:text-stone-300">
-                  {settings.language === 'ml' ? 'മലയാളം ഫോണ്ട്' : 'Malayalam Font'}: {settings.malayalamFontSize}px
-                </span>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => updateSetting('malayalamFontSize', Math.max(13, settings.malayalamFontSize - 1))}
-                    className="w-7 h-7 rounded-lg bg-stone-100 dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 font-bold flex items-center justify-center text-xs"
-                  >
-                    -
-                  </button>
-                  <button
-                    onClick={() => updateSetting('malayalamFontSize', Math.min(26, settings.malayalamFontSize + 1))}
-                    className="w-7 h-7 rounded-lg bg-stone-100 dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 font-bold flex items-center justify-center text-xs"
-                  >
-                    +
-                  </button>
+              {/* Malayalam Font Options */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-stone-700 dark:text-stone-300">
+                    {settings.language === 'ml' ? 'മലയാളം ഫോണ്ട്' : 'Malayalam Font'}
+                  </span>
+                  <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400">
+                    {settings.malayalamFontSize}px
+                  </span>
+                </div>
+                <div className="grid grid-cols-5 gap-1">
+                  {[
+                    { label: settings.language === 'ml' ? 'ചെറുത്' : 'Small', val: 14 },
+                    { label: settings.language === 'ml' ? 'സാധാരണം' : 'Normal', val: 16 },
+                    { label: settings.language === 'ml' ? 'ഇടത്തരം' : 'Medium', val: 18 },
+                    { label: settings.language === 'ml' ? 'വലുത്' : 'Large', val: 20 },
+                    { label: settings.language === 'ml' ? 'കൂടുതൽ' : 'Huge', val: 22 }
+                  ].map((size) => (
+                    <button
+                      key={size.val}
+                      onClick={() => {
+                        if ('vibrate' in navigator) navigator.vibrate(8);
+                        updateSetting('malayalamFontSize', size.val);
+                      }}
+                      className={`py-1.5 px-0.5 rounded-lg text-center border font-bold text-[10px] transition-all active:scale-95 ${
+                        settings.malayalamFontSize === size.val
+                          ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs'
+                          : 'bg-stone-50 dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100'
+                      }`}
+                    >
+                      {size.label}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
