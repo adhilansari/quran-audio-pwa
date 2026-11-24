@@ -1,0 +1,9 @@
+[
+  { "ayah": 1, "start": 0.0, "end": 4.5 },
+  { "ayah": 2, "start": 4.5, "end": 9.2 },
+  { "ayah": 3, "start": 9.2, "end": 13.8 },
+  { "ayah": 4, "start": 13.8, "end": 18.1 },
+  { "ayah": 5, "start": 18.1, "end": 24.3 },
+  { "ayah": 6, "start": 24.3, "end": 29.8 },
+  { "ayah": 7, "start": 29.8, "end": 42.5 }
+]

@@ -1,0 +1,36 @@
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Production build outputs
+dist/
+dist-ssr/
+build/
+.next/
+
+# Audio files (hosted on Cloudflare R2)
+malayalam quran mp3/
+*.mp3
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Local environment overrides
+.env.local
+.env.*.local
+
+# Editor & OS files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.sw?
+
+# Vite cache & temporary files
+.vite/
+*.tsbuildinfo
