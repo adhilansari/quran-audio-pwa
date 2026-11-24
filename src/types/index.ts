@@ -78,7 +78,9 @@ export type ThemeMode =
   | 'sapphire'
   | 'amethyst'
   | 'sage'
-  | 'rose';
+  | 'rose'
+  | 'glassDark'
+  | 'glassLight';
 export type UILanguage = 'ml' | 'en';
 export type RepeatMode = 'off' | 'surah' | 'all';
 

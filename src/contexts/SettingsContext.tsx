@@ -65,6 +65,8 @@ const translations: Record<UILanguage, Record<string, string>> = {
     themeAmethyst: "അമത്വിസ്റ്റ് (വെൽവെറ്റ്)",
     themeSage: "സേജ് (ഇളം പച്ച)",
     themeRose: "റോസ് (മദീന പുലരി)",
+    themeGlassDark: "ഡാർക്ക് ഗ്ലാസ് (Glassmorphism)",
+    themeGlassLight: "ക്രിസ്റ്റൽ ഗ്ലാസ് (Crystal Glass)",
     builtBy: "നിർമ്മാണം (Developed by)",
     supportProject: "സഹായിക്കുക (Support)",
     portfolio: "പോർട്ട്ഫോളിയോ",
@@ -135,6 +137,8 @@ const translations: Record<UILanguage, Record<string, string>> = {
     themeAmethyst: "Royal Amethyst",
     themeSage: "Sage Oasis",
     themeRose: "Madinah Rose",
+    themeGlassDark: "Dark Glass",
+    themeGlassLight: "Crystal Glass Light",
     builtBy: "Built by",
     supportProject: "Buy Me a Coffee",
     portfolio: "Portfolio",
@@ -192,14 +196,25 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Sync theme to DOM
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove('dark', 'sepia', 'midnight', 'sapphire', 'amethyst', 'sage', 'rose', 'light');
+    root.classList.remove(
+      'dark',
+      'sepia',
+      'midnight',
+      'sapphire',
+      'amethyst',
+      'sage',
+      'rose',
+      'glassDark',
+      'glassLight',
+      'light'
+    );
 
     let activeTheme = settings.theme;
     if (activeTheme === 'system') {
       activeTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
 
-    const darkThemes = ['dark', 'midnight', 'sapphire', 'amethyst'];
+    const darkThemes = ['dark', 'midnight', 'sapphire', 'amethyst', 'glassDark'];
     if (darkThemes.includes(activeTheme)) {
       root.classList.add('dark', activeTheme);
     } else {

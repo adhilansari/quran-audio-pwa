@@ -32,7 +32,9 @@ export const SettingsView: React.FC = () => {
     { id: 'sapphire', label: t('themeSapphire'), icon: <span className="text-xs">🌌</span> },
     { id: 'amethyst', label: t('themeAmethyst'), icon: <span className="text-xs">🔮</span> },
     { id: 'sage', label: t('themeSage'), icon: <span className="text-xs">🌿</span> },
-    { id: 'rose', label: t('themeRose'), icon: <span className="text-xs">🌸</span> }
+    { id: 'rose', label: t('themeRose'), icon: <span className="text-xs">🌸</span> },
+    { id: 'glassDark', label: t('themeGlassDark'), icon: <span className="text-xs">💎</span> },
+    { id: 'glassLight', label: t('themeGlassLight'), icon: <span className="text-xs">🪟</span> }
   ];
 
   const languages: { id: UILanguage; label: string }[] = [

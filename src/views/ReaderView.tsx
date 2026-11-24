@@ -955,6 +955,8 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber
                   { id: 'amethyst', label: 'Amethyst', icon: '🔮' },
                   { id: 'sage', label: 'Sage', icon: '🌿' },
                   { id: 'rose', label: 'Rose', icon: '🌸' },
+                  { id: 'glassDark', label: 'Dark Glass', icon: '💎' },
+                  { id: 'glassLight', label: 'Crystal', icon: '🪟' },
                   { id: 'system', label: settings.language === 'ml' ? 'സിസ്റ്റം' : 'Auto', icon: '⚙️' }
                 ].map((th) => (
                   <button

@@ -186,6 +186,149 @@ export const CATCHY_AYAHS: CatchyAyah[] = [
     malayalam: "അപ്പോൾ നിങ്ങളുടെ രക്ഷിതാവിന്റെ അനുഗ്രഹങ്ങളിൽ ഏതിനെയാണ് നിങ്ങൾ ഇരുവരും നിഷേധിക്കുന്നത്?",
     badgeMalayalam: "അനുഗ്രഹങ്ങൾ",
     badgeEnglish: "Blessings"
+  },
+  {
+    surahId: 9,
+    surahNumber: 9,
+    ayahNumber: 40,
+    surahNameMalayalam: "അത്തൗബ",
+    surahNameEnglish: "At-Tawbah",
+    arabic: "لَا تَحْزَنْ إِنَّ اللَّهَ مَعَنَا",
+    malayalam: "ദുഃഖിക്കേണ്ട, തീർച്ചയായും അല്ലാഹു നമ്മുടെ കൂടെയുണ്ട്.",
+    badgeMalayalam: "പ്രതീക്ഷ & ആശ്വാസം",
+    badgeEnglish: "Do Not Grieve"
+  },
+  {
+    surahId: 30,
+    surahNumber: 30,
+    ayahNumber: 21,
+    surahNameMalayalam: "അർറൂം",
+    surahNameEnglish: "Ar-Rum",
+    arabic: "وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً",
+    malayalam: "നിങ്ങൾക്ക് സമാധാനത്തോടെ വസിക്കാനായി നിങ്ങളുടെ വർഗ്ഗത്തിൽ നിന്ന് തന്നെ ഇണകളെ സൃഷ്ടിക്കുകയും, നിങ്ങൾക്കിടയിൽ സ്നേഹവും കാരുണ്യവും ഉണ്ടാക്കുകയും ചെയ്തത് അവന്റെ ദൃഷ്ടാന്തങ്ങളിൽ പെട്ടതത്രെ.",
+    badgeMalayalam: "വിവാഹം & സ്നേഹം",
+    badgeEnglish: "Marriage & Love"
+  },
+  {
+    surahId: 5,
+    surahNumber: 5,
+    ayahNumber: 2,
+    surahNameMalayalam: "അൽമാഇദ",
+    surahNameEnglish: "Al-Ma'idah",
+    arabic: "وَتَعَاوَنُوا عَلَى الْبِرِّ وَالتَّقْوَىٰ",
+    malayalam: "പുണ്യത്തിലും ധർമ്മനിഷ്ഠയിലും നിങ്ങൾ അന്യോന്യം സഹായിക്കുക.",
+    badgeMalayalam: "സഹായം & നന്മ",
+    badgeEnglish: "Helping & Goodness"
+  },
+  {
+    surahId: 2,
+    surahNumber: 2,
+    ayahNumber: 261,
+    surahNameMalayalam: "അൽബഖറ",
+    surahNameEnglish: "Al-Baqarah",
+    arabic: "مَّثَلُ الَّذِينَ يُنفِقُونَ أَمْوَالَهُمْ فِي سَبِيلِ اللَّهِ كَمَثَلِ حَبَّةٍ أَنبَتَتْ سَبْعَ سَنَابِلَ فِي كُلِّ سُنبُلَةٍ مِّائَةُ حَبَّةٍ",
+    malayalam: "അല്ലാഹുവിന്റെ മാർഗ്ഗത്തിൽ തങ്ങളുടെ ധനം ചെലവഴിക്കുന്നവരെ ഉപമിക്കാവുന്നത് ഒരു ധാന്യമണിയോടാകുന്നു; അത് ഏഴ് കതിരുകൾ ഉൽപാദിപ്പിച്ചു, ഓരോ കതിരിലും നൂറ് വീതം ധാന്യമണികൾ.",
+    badgeMalayalam: "സ്വദഖ & ദാനം",
+    badgeEnglish: "Sadaqah & Charity"
+  },
+  {
+    surahId: 51,
+    surahNumber: 51,
+    ayahNumber: 56,
+    surahNameMalayalam: "അദ്ദാരിയാത്ത്",
+    surahNameEnglish: "Adh-Dhariyat",
+    arabic: "وَمَا خَلَقْتُ الْجِنَّ وَالْإِنسَ إِلَّا لِيَعْبُدُونِ",
+    malayalam: "എന്നെ മാത്രം ആരാധിക്കുവാൻ വേണ്ടിയല്ലാതെ ജിന്നുകളെയും മനുഷ്യരെയും ഞാൻ സൃഷ്ടിച്ചിട്ടില്ല.",
+    badgeMalayalam: "ജീവിത ലക്ഷ്യം",
+    badgeEnglish: "Purpose of Life"
+  },
+  {
+    surahId: 50,
+    surahNumber: 50,
+    ayahNumber: 16,
+    surahNameMalayalam: "ഖാഫ്",
+    surahNameEnglish: "Qaf",
+    arabic: "وَنَحْنُ أَقْرَبُ إِلَيْهِ مِنْ حَبْلِ الْوَرِيدِ",
+    malayalam: "നാം മനുഷ്യനിലേക്ക് അവന്റെ ജീവനാഡിയേക്കാൾ അടുത്തവനാകുന്നു.",
+    badgeMalayalam: "ഏകാന്തത & സാമീപ്യം",
+    badgeEnglish: "Never Alone"
+  },
+  {
+    surahId: 49,
+    surahNumber: 49,
+    ayahNumber: 10,
+    surahNameMalayalam: "അൽഹുജുറാത്ത്",
+    surahNameEnglish: "Al-Hujurat",
+    arabic: "إِنَّمَا الْمُؤْمِنُونَ إِخْوَةٌ فَأَصْلِحُوا بَيْنَ أَخَوَيْكُمْ",
+    malayalam: "തീർച്ചയായും സത്യവിശ്വാസികൾ സഹോദരന്മാരാകുന്നു; അതിനാൽ നിങ്ങളുടെ സഹോദരന്മാർക്കിടയിൽ നിങ്ങൾ രഞ്ജിപ്പുണ്ടാക്കുക.",
+    badgeMalayalam: "സാഹോദര്യം & കൂട്ടായ്മ",
+    badgeEnglish: "Brotherhood & Unity"
+  },
+  {
+    surahId: 53,
+    surahNumber: 53,
+    ayahNumber: 39,
+    surahNameMalayalam: "അന്നജ്മ്",
+    surahNameEnglish: "An-Najm",
+    arabic: "وَأَن لَّيْسَ لِلْإِنسَانِ إِلَّا مَا سَعَىٰ",
+    malayalam: "മനുഷ്യന് താൻ പരിശ്രമിച്ചതല്ലാതെ മറ്റൊന്നുമില്ല.",
+    badgeMalayalam: "അധ്വാനം & ജോലി",
+    badgeEnglish: "Effort & Work"
+  },
+  {
+    surahId: 18,
+    surahNumber: 18,
+    ayahNumber: 46,
+    surahNameMalayalam: "അൽകഹ്ഫ്",
+    surahNameEnglish: "Al-Kahf",
+    arabic: "الْمَالُ وَالْبَنُونَ زِينَةُ الْحَيَاةِ الدُّنْيَا ۖ وَالْبَاقِيَاتُ الصَّالِحَاتُ خَيْرٌ عِندَ رَبِّكَ ثَوَابًا وَخَيْرٌ أَمَلًا",
+    malayalam: "ധനവും സന്താനങ്ങളും ഐഹികജീവിതത്തിന്റെ അലങ്കാരമത്രെ; എന്നാൽ ശാശ്വതമായി നിലനിൽക്കുന്ന സൽകർമ്മങ്ങളാണ് നിന്റെ രക്ഷിതാവിങ്കൽ കൂടുതൽ പ്രതിഫലമുള്ളതും ഉത്തമമായ പ്രത്യാശ നൽകുന്നതും.",
+    badgeMalayalam: "സമ്പത്ത് & നന്മകൾ",
+    badgeEnglish: "Wealth & Contentment"
+  },
+  {
+    surahId: 87,
+    surahNumber: 87,
+    ayahNumber: 16,
+    surahNameMalayalam: "അൽഅഅ്ലാ",
+    surahNameEnglish: "Al-A'la",
+    arabic: "بَلْ تُؤْثِرُونَ الْحَيَاةَ الدُّنْيَا • وَالْآخِرَةُ خَيْرٌ وَأَبْقَىٰ",
+    malayalam: "പക്ഷേ, നിങ്ങൾ ഐഹികജീവിതത്തിന് മുൻഗണന നൽകുന്നു. പരലോകമാകുന്നു ഏറ്റവും ഉത്തമവും ശാശ്വതവുമായത്.",
+    badgeMalayalam: "ദുനിയാവും ആഖിറവും",
+    badgeEnglish: "Dunya & Hereafter"
+  },
+  {
+    surahId: 10,
+    surahNumber: 10,
+    ayahNumber: 58,
+    surahNameMalayalam: "യൂനുസ്",
+    surahNameEnglish: "Yunus",
+    arabic: "قُلْ بِفَضْلِ اللَّهِ وَبِرَحْمَتِهِ فَبِذَٰلِكَ فَلْيَفْرَحُوا",
+    malayalam: "പറയുക: അല്ലാഹുവിന്റെ അനുഗ്രഹം കൊണ്ടും അവന്റെ കാരുണ്യം കൊണ്ടുമാണത്; അതിനാൽ അവർ സന്തോഷിച്ചുകൊള്ളട്ടെ.",
+    badgeMalayalam: "സന്തോഷം & കൃപ",
+    badgeEnglish: "Joy & Happiness"
+  },
+  {
+    surahId: 14,
+    surahNumber: 14,
+    ayahNumber: 7,
+    surahNameMalayalam: "ഇബ്രാഹീം",
+    surahNameEnglish: "Ibrahim",
+    arabic: "لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ",
+    malayalam: "നിങ്ങൾ നന്ദി കാണിക്കുകയാണെങ്കിൽ തീർച്ചയായും ഞാൻ നിങ്ങൾക്ക് കൂടുതൽ നൽകുന്നതാണ്.",
+    badgeMalayalam: "ശുക്റ് & നന്ദി",
+    badgeEnglish: "Gratitude & Shukr"
+  },
+  {
+    surahId: 2,
+    surahNumber: 2,
+    ayahNumber: 153,
+    surahNameMalayalam: "അൽബഖറ",
+    surahNameEnglish: "Al-Baqarah",
+    arabic: "يَا أَيُّهَا الَّذِينَ آمَنُوا اسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ ۚ إِنَّ اللَّهَ مَعَ الصَّابِرِينَ",
+    malayalam: "സത്യവിശ്വാസികളേ, ക്ഷമ കൊണ്ടും പ്രാർത്ഥന കൊണ്ടും നിങ്ങൾ സഹായം തേടുക; നിശ്ചയമായും അല്ലാഹു ക്ഷമിക്കുന്നവരുടെ കൂടെയാകുന്നു.",
+    badgeMalayalam: "ക്ഷമ & വിജയം",
+    badgeEnglish: "Patience & Sabr"
   }
 ];
 

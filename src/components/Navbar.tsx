@@ -102,6 +102,18 @@ export const Navbar: React.FC<NavbarProps> = () => {
       icon: <span className="text-sm">🌸</span>
     },
     {
+      id: 'glassDark',
+      labelMl: 'ഡാർക്ക് ഗ്ലാസ് (Aurora)',
+      labelEn: 'Dark Glass (Aurora)',
+      icon: <span className="text-sm">💎</span>
+    },
+    {
+      id: 'glassLight',
+      labelMl: 'ക്രിസ്റ്റൽ ഗ്ലാസ് (Light)',
+      labelEn: 'Crystal Glass (Light)',
+      icon: <span className="text-sm">🪟</span>
+    },
+    {
       id: 'system',
       labelMl: 'സിസ്റ്റം (ഓട്ടോ)',
       labelEn: 'System (Auto)',
@@ -186,6 +198,10 @@ export const Navbar: React.FC<NavbarProps> = () => {
                 <span className="text-xs">🌿</span>
               ) : settings.theme === 'rose' ? (
                 <span className="text-xs">🌸</span>
+              ) : settings.theme === 'glassDark' ? (
+                <span className="text-xs">💎</span>
+              ) : settings.theme === 'glassLight' ? (
+                <span className="text-xs">🪟</span>
               ) : settings.theme === 'system' ? (
                 <span className="text-xs">⚙️</span>
               ) : (
