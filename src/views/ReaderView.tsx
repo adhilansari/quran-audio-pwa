@@ -530,11 +530,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
           {/* Auto-Scroll Toggle */}
           <button
             onClick={() => setIsAutoScrolling(!isAutoScrolling)}
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
-              isAutoScrolling
-                ? 'bg-amber-400 text-emerald-950 border-amber-300 font-bold shadow-xs'
-                : 'border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-emerald-950'
-            }`}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all ${isAutoScrolling
+              ? 'bg-amber-400 text-emerald-950 border-amber-300 font-bold shadow-xs'
+              : 'border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-emerald-950'
+              }`}
             title="Auto-Scroll"
           >
             <ChevronsDown className={`w-3.5 h-3.5 ${isAutoScrolling ? 'animate-bounce text-emerald-950' : 'text-amber-500'}`} />
@@ -545,11 +544,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
           {/* Typography Controls Toggle */}
           <button
             onClick={() => setShowTypographyControls(!showTypographyControls)}
-            className={`p-2 rounded-lg border text-xs font-semibold transition-all ${
-              showTypographyControls
-                ? 'bg-emerald-800 text-amber-300 border-emerald-700'
-                : 'border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-emerald-950'
-            }`}
+            className={`p-2 rounded-lg border text-xs font-semibold transition-all ${showTypographyControls
+              ? 'bg-emerald-800 text-amber-300 border-emerald-700'
+              : 'border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-emerald-950'
+              }`}
             title="Adjust Fonts"
           >
             <Type className="w-4 h-4" />
@@ -598,10 +596,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                 <span>{t('arabicSize')}</span>
                 <span className="font-bold text-emerald-700 dark:text-amber-400">
                   {settings.arabicFontSize <= 24 ? (settings.language === 'ml' ? 'ചെറുത്' : 'Small') :
-                   settings.arabicFontSize <= 28 ? (settings.language === 'ml' ? 'സാധാരണം' : 'Normal') :
-                   settings.arabicFontSize <= 32 ? (settings.language === 'ml' ? 'ഇടത്തരം' : 'Medium') :
-                   settings.arabicFontSize <= 36 ? (settings.language === 'ml' ? 'വലുത്' : 'Large') :
-                   (settings.language === 'ml' ? 'വളരെ വലുത്' : 'Huge')}
+                    settings.arabicFontSize <= 28 ? (settings.language === 'ml' ? 'സാധാരണം' : 'Normal') :
+                      settings.arabicFontSize <= 32 ? (settings.language === 'ml' ? 'ഇടത്തരം' : 'Medium') :
+                        settings.arabicFontSize <= 36 ? (settings.language === 'ml' ? 'വലുത്' : 'Large') :
+                          (settings.language === 'ml' ? 'വളരെ വലുത്' : 'Huge')}
                 </span>
               </div>
               <div className="grid grid-cols-5 gap-1.5">
@@ -618,11 +616,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                       if ('vibrate' in navigator) navigator.vibrate(8);
                       updateSetting('arabicFontSize', opt.size);
                     }}
-                    className={`py-1.5 px-1 rounded-xl text-center text-xs font-bold transition-all border ${
-                      settings.arabicFontSize === opt.size
-                        ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs scale-102'
-                        : 'bg-white dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-300 hover:bg-stone-50'
-                    }`}
+                    className={`py-1.5 px-1 rounded-xl text-center text-xs font-bold transition-all border ${settings.arabicFontSize === opt.size
+                      ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs scale-102'
+                      : 'bg-white dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-300 hover:bg-stone-50'
+                      }`}
                   >
                     {settings.language === 'ml' ? opt.labelMl : opt.labelEn}
                   </button>
@@ -636,10 +633,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                 <span>{t('malayalamSize')}</span>
                 <span className="font-bold text-emerald-700 dark:text-amber-400">
                   {settings.malayalamFontSize <= 14 ? (settings.language === 'ml' ? 'ചെറുത്' : 'Small') :
-                   settings.malayalamFontSize <= 16 ? (settings.language === 'ml' ? 'സാധാരണം' : 'Normal') :
-                   settings.malayalamFontSize <= 18 ? (settings.language === 'ml' ? 'ഇടത്തരം' : 'Medium') :
-                   settings.malayalamFontSize <= 20 ? (settings.language === 'ml' ? 'വലുത്' : 'Large') :
-                   (settings.language === 'ml' ? 'വളരെ വലുത്' : 'Huge')}
+                    settings.malayalamFontSize <= 16 ? (settings.language === 'ml' ? 'സാധാരണം' : 'Normal') :
+                      settings.malayalamFontSize <= 18 ? (settings.language === 'ml' ? 'ഇടത്തരം' : 'Medium') :
+                        settings.malayalamFontSize <= 20 ? (settings.language === 'ml' ? 'വലുത്' : 'Large') :
+                          (settings.language === 'ml' ? 'വളരെ വലുത്' : 'Huge')}
                 </span>
               </div>
               <div className="grid grid-cols-5 gap-1.5">
@@ -656,11 +653,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                       if ('vibrate' in navigator) navigator.vibrate(8);
                       updateSetting('malayalamFontSize', opt.size);
                     }}
-                    className={`py-1.5 px-1 rounded-xl text-center text-xs font-bold transition-all border ${
-                      settings.malayalamFontSize === opt.size
-                        ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs scale-102'
-                        : 'bg-white dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-300 hover:bg-stone-50'
-                    }`}
+                    className={`py-1.5 px-1 rounded-xl text-center text-xs font-bold transition-all border ${settings.malayalamFontSize === opt.size
+                      ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs scale-102'
+                      : 'bg-white dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-300 hover:bg-stone-50'
+                      }`}
                   >
                     {settings.language === 'ml' ? opt.labelMl : opt.labelEn}
                   </button>
@@ -767,22 +763,20 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                     if (el) ayahRefs.current.set(ayah.ayah, el);
                     else ayahRefs.current.delete(ayah.ayah);
                   }}
-                  className={`rounded-2xl p-4 transition-all duration-300 border ${
-                    isPlayingThisAyah
-                      ? 'bg-amber-50 dark:bg-emerald-950/80 border-amber-400 dark:border-amber-400/80 shadow-md ring-2 ring-amber-400/20'
-                      : jumpedAyah === ayah.ayah
+                  className={`rounded-2xl p-4 transition-all duration-300 border ${isPlayingThisAyah
+                    ? 'bg-amber-50 dark:bg-emerald-950/80 border-amber-400 dark:border-amber-400/80 shadow-md ring-2 ring-amber-400/20'
+                    : jumpedAyah === ayah.ayah
                       ? 'bg-amber-50/70 dark:bg-emerald-950/90 border-amber-500 ring-4 ring-amber-400/40 shadow-xl scale-[1.01]'
                       : 'bg-white dark:bg-[#12201c] border-stone-200 dark:border-emerald-950/70 hover:border-emerald-300 dark:hover:border-emerald-900'
-                  }`}
+                    }`}
                 >
                   {/* Ayah Header Row */}
                   <div className="flex items-center justify-between pb-2 mb-2 border-b border-stone-100 dark:border-emerald-950">
                     <div className="flex items-center gap-2">
-                      <span className={`w-6 h-6 rounded-full font-bold text-xs flex items-center justify-center ${
-                        isPlayingThisAyah || jumpedAyah === ayah.ayah
-                          ? 'bg-amber-400 text-emerald-950 font-black'
-                          : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-amber-300'
-                      }`}>
+                      <span className={`w-6 h-6 rounded-full font-bold text-xs flex items-center justify-center ${isPlayingThisAyah || jumpedAyah === ayah.ayah
+                        ? 'bg-amber-400 text-emerald-950 font-black'
+                        : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-amber-300'
+                        }`}>
                         {ayah.ayah}
                       </span>
                       {jumpedAyah === ayah.ayah && (
@@ -797,11 +791,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                       {/* Play Single Ayah Recitation */}
                       <button
                         onClick={() => handlePlaySingleAyah(ayah)}
-                        className={`p-1.5 rounded-lg transition-colors ${
-                          isPlayingThisAyah
-                            ? 'text-amber-500 bg-amber-50 dark:bg-emerald-950'
-                            : 'text-stone-400 hover:text-emerald-700 dark:hover:text-amber-300'
-                        }`}
+                        className={`p-1.5 rounded-lg transition-colors ${isPlayingThisAyah
+                          ? 'text-amber-500 bg-amber-50 dark:bg-emerald-950'
+                          : 'text-stone-400 hover:text-emerald-700 dark:hover:text-amber-300'
+                          }`}
                         title={isPlayingThisAyah ? 'Stop Ayah Recitation' : 'Listen to this Ayah'}
                       >
                         {isPlayingThisAyah ? (
@@ -982,22 +975,19 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
           ballPos
             ? { left: `${ballPos.x}px`, top: `${ballPos.y}px`, right: 'auto', bottom: 'auto' }
             : currentSurah
-            ? { bottom: '80px' }
-            : { bottom: '24px' }
+              ? { bottom: '80px' }
+              : { bottom: '24px' }
         }
-        className={`fixed right-3 sm:right-5 z-40 select-none transition-opacity duration-300 touch-none cursor-grab active:cursor-grabbing ${
-          isFaded ? 'opacity-35 hover:opacity-100 scale-90' : 'opacity-100 scale-100'
-        }`}
+        className={`fixed right-3 sm:right-5 z-40 select-none transition-opacity duration-300 touch-none cursor-grab active:cursor-grabbing ${isFaded ? 'opacity-35 hover:opacity-100 scale-90' : 'opacity-100 scale-100'
+          }`}
       >
         <button
           type="button"
-          className={`w-12 h-12 rounded-full flex items-center justify-center shadow-2xl transition-transform ${
-            isBlinking ? 'animate-pulse ring-4 ring-amber-400/60' : ''
-          } ${
-            isAssistiveOpen
+          className={`w-12 h-12 rounded-full flex items-center justify-center shadow-2xl transition-transform ${isBlinking ? 'animate-pulse ring-4 ring-amber-400/60' : ''
+            } ${isAssistiveOpen
               ? 'bg-amber-400 text-emerald-950 rotate-90 scale-105'
               : 'bg-emerald-800 text-amber-300 border-2 border-amber-400/80 hover:scale-105'
-          }`}
+            }`}
           title="Reading Assistant Settings (Drag to move)"
         >
           {isAssistiveOpen ? (
@@ -1050,11 +1040,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                 </span>
                 <button
                   onClick={() => setIsAutoScrolling(!isAutoScrolling)}
-                  className={`px-3 py-1 rounded-xl font-bold text-xs flex items-center gap-1 transition-all ${
-                    isAutoScrolling
-                      ? 'bg-amber-400 text-emerald-950 shadow-xs'
-                      : 'bg-emerald-800 text-amber-300'
-                  }`}
+                  className={`px-3 py-1 rounded-xl font-bold text-xs flex items-center gap-1 transition-all ${isAutoScrolling
+                    ? 'bg-amber-400 text-emerald-950 shadow-xs'
+                    : 'bg-emerald-800 text-amber-300'
+                    }`}
                 >
                   {isAutoScrolling ? <Pause className="w-3 h-3 fill-current" /> : <Play className="w-3 h-3 fill-current" />}
                   <span>{isAutoScrolling ? 'Pause' : 'Start'}</span>
@@ -1073,11 +1062,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                         if ('vibrate' in navigator) navigator.vibrate(8);
                         setAutoScrollSpeed(spd);
                       }}
-                      className={`px-2 py-0.5 rounded-lg font-bold text-xs transition-all active:scale-95 ${
-                        autoScrollSpeed === spd
-                          ? 'bg-emerald-800 text-amber-300 shadow-xs'
-                          : 'bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 text-stone-700 dark:text-stone-300'
-                      }`}
+                      className={`px-2 py-0.5 rounded-lg font-bold text-xs transition-all active:scale-95 ${autoScrollSpeed === spd
+                        ? 'bg-emerald-800 text-amber-300 shadow-xs'
+                        : 'bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 text-stone-700 dark:text-stone-300'
+                        }`}
                     >
                       {spd}x
                     </button>
@@ -1112,11 +1100,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                       if ('vibrate' in navigator) navigator.vibrate(8);
                       updateSetting('theme', th.id as ThemeMode);
                     }}
-                    className={`py-2 px-1 rounded-xl text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 border transition-all active:scale-95 ${
-                      settings.theme === th.id
-                        ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs scale-102 font-extrabold'
-                        : 'bg-stone-50 dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-300 hover:bg-stone-100'
-                    }`}
+                    className={`py-2 px-1 rounded-xl text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 border transition-all active:scale-95 ${settings.theme === th.id
+                      ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs scale-102 font-extrabold'
+                      : 'bg-stone-50 dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-300 hover:bg-stone-100'
+                      }`}
                   >
                     <span className="text-sm">{th.icon}</span>
                     <span className="truncate max-w-[65px]">{th.label}</span>
@@ -1151,11 +1138,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                         if ('vibrate' in navigator) navigator.vibrate(8);
                         updateSetting('arabicFontSize', size.val);
                       }}
-                      className={`py-1.5 px-0.5 rounded-lg text-center border font-bold text-[10px] transition-all active:scale-95 ${
-                        settings.arabicFontSize === size.val
-                          ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs'
-                          : 'bg-stone-50 dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100'
-                      }`}
+                      className={`py-1.5 px-0.5 rounded-lg text-center border font-bold text-[10px] transition-all active:scale-95 ${settings.arabicFontSize === size.val
+                        ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs'
+                        : 'bg-stone-50 dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100'
+                        }`}
                     >
                       {size.label}
                     </button>
@@ -1187,11 +1173,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                         if ('vibrate' in navigator) navigator.vibrate(8);
                         updateSetting('malayalamFontSize', size.val);
                       }}
-                      className={`py-1.5 px-0.5 rounded-lg text-center border font-bold text-[10px] transition-all active:scale-95 ${
-                        settings.malayalamFontSize === size.val
-                          ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs'
-                          : 'bg-stone-50 dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100'
-                      }`}
+                      className={`py-1.5 px-0.5 rounded-lg text-center border font-bold text-[10px] transition-all active:scale-95 ${settings.malayalamFontSize === size.val
+                        ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs'
+                        : 'bg-stone-50 dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100'
+                        }`}
                     >
                       {size.label}
                     </button>
@@ -1204,11 +1189,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
             <div className="grid grid-cols-2 gap-2 pt-1 border-t border-stone-100 dark:border-emerald-950 text-xs">
               <button
                 onClick={() => updateSetting('showArabic', !settings.showArabic)}
-                className={`py-2 px-3 rounded-xl border flex items-center justify-center gap-1.5 font-semibold transition-all ${
-                  settings.showArabic
-                    ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
-                    : 'bg-stone-50 dark:bg-emerald-950/30 border-stone-200 dark:border-emerald-900 text-stone-400'
-                }`}
+                className={`py-2 px-3 rounded-xl border flex items-center justify-center gap-1.5 font-semibold transition-all ${settings.showArabic
+                  ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
+                  : 'bg-stone-50 dark:bg-emerald-950/30 border-stone-200 dark:border-emerald-900 text-stone-400'
+                  }`}
               >
                 {settings.showArabic ? <Eye className="w-3.5 h-3.5 text-emerald-600" /> : <EyeOff className="w-3.5 h-3.5" />}
                 <span>{settings.language === 'ml' ? 'അറബിക്' : 'Arabic'}</span>
@@ -1216,11 +1200,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
 
               <button
                 onClick={() => updateSetting('showMalayalam', !settings.showMalayalam)}
-                className={`py-2 px-3 rounded-xl border flex items-center justify-center gap-1.5 font-semibold transition-all ${
-                  settings.showMalayalam
-                    ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
-                    : 'bg-stone-50 dark:bg-emerald-950/30 border-stone-200 dark:border-emerald-900 text-stone-400'
-                }`}
+                className={`py-2 px-3 rounded-xl border flex items-center justify-center gap-1.5 font-semibold transition-all ${settings.showMalayalam
+                  ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
+                  : 'bg-stone-50 dark:bg-emerald-950/30 border-stone-200 dark:border-emerald-900 text-stone-400'
+                  }`}
               >
                 {settings.showMalayalam ? <Eye className="w-3.5 h-3.5 text-emerald-600" /> : <EyeOff className="w-3.5 h-3.5" />}
                 <span>{settings.language === 'ml' ? 'മലയാളം' : 'Malayalam'}</span>
