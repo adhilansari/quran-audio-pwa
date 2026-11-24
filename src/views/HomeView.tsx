@@ -11,12 +11,14 @@ import {
   Loader2,
   Bookmark,
   History,
-  CheckCircle2
+  CheckCircle2,
+  RefreshCw
 } from 'lucide-react';
 import { Surah, PlayHistory, ReadingHistoryItem } from '@/types';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useAudio } from '@/contexts/AudioContext';
 import { getPlayHistory, getReadingHistory } from '@/services/db';
+import { CATCHY_AYAHS, getDailyAyahIndex } from '@/data/catchyAyahs';
 
 interface HomeViewProps {
   surahs: Surah[];
@@ -35,6 +37,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const { playSurah, togglePlay, currentSurah, isPlaying, isLoading } = useAudio();
   const [lastHistory, setLastHistory] = useState<PlayHistory | null>(null);
   const [readingHistory, setReadingHistory] = useState<ReadingHistoryItem[]>([]);
+  const [dailyAyahIndex, setDailyAyahIndex] = useState(() => getDailyAyahIndex());
+  const [isShuffling, setIsShuffling] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -48,6 +52,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
     loadData();
   }, [isPlaying]);
 
+  const currentCatchyAyah = CATCHY_AYAHS[dailyAyahIndex] || CATCHY_AYAHS[0];
+
+  const handleShuffleAyah = () => {
+    setIsShuffling(true);
+    let nextIdx = Math.floor(Math.random() * CATCHY_AYAHS.length);
+    if (nextIdx === dailyAyahIndex) {
+      nextIdx = (nextIdx + 1) % CATCHY_AYAHS.length;
+    }
+    setTimeout(() => {
+      setDailyAyahIndex(nextIdx);
+      setIsShuffling(false);
+    }, 200);
+  };
+
   const lastPlayedSurah = lastHistory ? surahs.find(s => s.id === lastHistory.surahId) : null;
 
   // Curated Quick Access surahs: 1. Al-Fatihah, 18. Al-Kahf, 36. Yasin, 67. Al-Mulk
@@ -57,31 +75,55 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
   return (
     <div className="space-y-5 animate-in fade-in duration-200">
-      {/* Hero Greeting / Daily Ayah Card */}
+      {/* Hero Greeting / Catchy Daily Ayah Card (Rotates daily + on-demand shuffle) */}
       <div className="bg-gradient-to-tr from-emerald-900 via-emerald-800 to-emerald-900 text-white rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden border border-amber-400/20">
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-950/60 border border-amber-400/30 text-[11px] font-bold text-amber-300 mb-3">
-            <Sparkles className="w-3 h-3" />
-            <span>{t('dailyAyah')}</span>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-950/60 border border-amber-400/30 text-[11px] font-bold text-amber-300">
+                <Sparkles className="w-3 h-3 text-amber-400" />
+                <span>{t('dailyAyah')}</span>
+              </div>
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-800/80 border border-emerald-700 text-emerald-200">
+                {settings.language === 'ml' ? currentCatchyAyah.badgeMalayalam : currentCatchyAyah.badgeEnglish}
+              </span>
+            </div>
+
+            {/* Shuffle / Random Ayah Button */}
+            <button
+              onClick={handleShuffleAyah}
+              className="p-1.5 rounded-xl bg-emerald-950/60 hover:bg-emerald-950 border border-amber-400/30 text-amber-300 hover:text-amber-200 transition-all flex items-center gap-1 text-[11px] font-bold"
+              title={settings.language === 'ml' ? 'മറ്റൊരു വചനം കാണുക' : 'Shuffle Ayah'}
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isShuffling ? 'animate-spin text-amber-400' : ''}`} />
+              <span className="hidden sm:inline">
+                {settings.language === 'ml' ? 'മാറ്റുക' : 'Shuffle'}
+              </span>
+            </button>
           </div>
 
-          {/* Daily Verse (Surah Al-Baqarah 2:286 or Al-Fatihah) */}
+          {/* Catchy Verse Arabic */}
           <p className="font-arabic text-xl sm:text-2xl text-amber-100 leading-relaxed mb-3 text-right">
-            لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا
+            {currentCatchyAyah.arabic}
           </p>
 
+          {/* Catchy Verse Malayalam */}
           <p className="font-malayalam text-xs sm:text-sm text-emerald-100 leading-normal mb-3">
-            "അല്ലാഹു ഒരാളോടും അവരുടെ കഴിവിനപ്പുറമുള്ള യാതൊന്നും കൽപിക്കുന്നില്ല."
+            "{currentCatchyAyah.malayalam}"
           </p>
 
-          <div className="flex items-center justify-between pt-2 border-t border-emerald-700/50 text-[11px] text-emerald-200">
-            <span>സൂറത്തുൽ ബഖറ 2:286</span>
+          <div className="flex items-center justify-between pt-2.5 border-t border-emerald-700/50 text-[11px] text-emerald-200">
+            <span className="font-medium">
+              {settings.language === 'ml'
+                ? `സൂറത്ത് ${currentCatchyAyah.surahNameMalayalam} ${currentCatchyAyah.surahNumber}:${currentCatchyAyah.ayahNumber}`
+                : `Surah ${currentCatchyAyah.surahNameEnglish} ${currentCatchyAyah.surahNumber}:${currentCatchyAyah.ayahNumber}`}
+            </span>
             <button
               onClick={() => {
-                const s2 = surahs.find(s => s.id === 2);
-                if (s2) onOpenReader(s2, 286);
+                const targetSurah = surahs.find(s => s.id === currentCatchyAyah.surahId);
+                if (targetSurah) onOpenReader(targetSurah, currentCatchyAyah.ayahNumber);
               }}
-              className="text-amber-300 font-semibold hover:underline flex items-center gap-0.5"
+              className="text-amber-300 font-bold hover:underline flex items-center gap-0.5 bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-amber-400/20"
             >
               <span>{t('readerMode')}</span>
               <ChevronRight className="w-3 h-3" />
