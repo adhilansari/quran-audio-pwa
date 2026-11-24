@@ -14,6 +14,7 @@ import {
   Copy,
   Check,
   ChevronDown,
+  ChevronRight,
   Share2,
   ChevronsDown,
   X,
@@ -31,14 +32,21 @@ import { useAudio } from '@/contexts/AudioContext';
 import { isBookmarked, addBookmark, removeBookmark, saveReadingHistory } from '@/services/db';
 import { loadSurahAyahs } from '@/services/translationService';
 import { AyahShareModal } from '@/components/AyahShareModal';
+import surahsData from '@/data/surahs.json';
 
 interface ReaderViewProps {
   surah: Surah;
   initialAyahNumber?: number;
   onBack: () => void;
+  onSelectSurah?: (surah: Surah) => void;
 }
 
-export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber, onBack }) => {
+export const ReaderView: React.FC<ReaderViewProps> = ({
+  surah,
+  initialAyahNumber,
+  onBack,
+  onSelectSurah
+}) => {
   const { settings, updateSetting, t } = useSettings();
   const {
     currentSurah,
@@ -72,6 +80,100 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber
   const [isBlinking, setIsBlinking] = useState(true);
   const [jumpInputAyah, setJumpInputAyah] = useState('');
   const fadeTimeoutRef = useRef<any>(null);
+
+  // Draggable Assistive Ball position state
+  const [ballPos, setBallPos] = useState<{ x: number; y: number } | null>(null);
+  const dragInfoRef = useRef<{
+    startX: number;
+    startY: number;
+    origX: number;
+    origY: number;
+    hasDragged: boolean;
+  } | null>(null);
+  const ballElemRef = useRef<HTMLDivElement>(null);
+
+  const handleBallTouchStart = (e: React.TouchEvent) => {
+    resetFadeTimer();
+    const touch = e.touches[0];
+    const rect = ballElemRef.current?.getBoundingClientRect();
+    if (rect) {
+      dragInfoRef.current = {
+        startX: touch.clientX,
+        startY: touch.clientY,
+        origX: rect.left,
+        origY: rect.top,
+        hasDragged: false
+      };
+    }
+  };
+
+  const handleBallTouchMove = (e: React.TouchEvent) => {
+    if (!dragInfoRef.current) return;
+    const touch = e.touches[0];
+    const deltaX = touch.clientX - dragInfoRef.current.startX;
+    const deltaY = touch.clientY - dragInfoRef.current.startY;
+
+    if (Math.hypot(deltaX, deltaY) > 5) {
+      dragInfoRef.current.hasDragged = true;
+    }
+
+    if (dragInfoRef.current.hasDragged) {
+      const newX = Math.max(10, Math.min(window.innerWidth - 58, dragInfoRef.current.origX + deltaX));
+      const newY = Math.max(70, Math.min(window.innerHeight - 80, dragInfoRef.current.origY + deltaY));
+      setBallPos({ x: newX, y: newY });
+    }
+  };
+
+  const handleBallTouchEnd = () => {
+    if (dragInfoRef.current) {
+      if (!dragInfoRef.current.hasDragged) {
+        setIsAssistiveOpen(prev => !prev);
+      }
+      dragInfoRef.current = null;
+    }
+  };
+
+  const handleBallMouseDown = (e: React.MouseEvent) => {
+    resetFadeTimer();
+    const rect = ballElemRef.current?.getBoundingClientRect();
+    if (rect) {
+      dragInfoRef.current = {
+        startX: e.clientX,
+        startY: e.clientY,
+        origX: rect.left,
+        origY: rect.top,
+        hasDragged: false
+      };
+
+      const handleMouseMove = (moveEvt: MouseEvent) => {
+        if (!dragInfoRef.current) return;
+        const deltaX = moveEvt.clientX - dragInfoRef.current.startX;
+        const deltaY = moveEvt.clientY - dragInfoRef.current.startY;
+        if (Math.hypot(deltaX, deltaY) > 5) {
+          dragInfoRef.current.hasDragged = true;
+        }
+        if (dragInfoRef.current.hasDragged) {
+          const newX = Math.max(10, Math.min(window.innerWidth - 58, dragInfoRef.current.origX + deltaX));
+          const newY = Math.max(70, Math.min(window.innerHeight - 80, dragInfoRef.current.origY + deltaY));
+          setBallPos({ x: newX, y: newY });
+        }
+      };
+
+      const handleMouseUp = () => {
+        if (dragInfoRef.current) {
+          if (!dragInfoRef.current.hasDragged) {
+            setIsAssistiveOpen(prev => !prev);
+          }
+          dragInfoRef.current = null;
+        }
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+  };
 
   // Ayah-level single recitation audio
   const [playingAyahNum, setPlayingAyahNum] = useState<number | null>(null);
@@ -251,19 +353,6 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber
       }
     };
   }, [isAutoScrolling, autoScrollSpeed, visibleCount, ayahs.length]);
-
-  // Smooth scroll into view when active ayah changes (if chapter timings exist)
-  useEffect(() => {
-    if (currentAyahNumber && currentSurah?.id === surah.id) {
-      if (currentAyahNumber > visibleCount) {
-        setVisibleCount(Math.min(ayahs.length, currentAyahNumber + 10));
-      }
-      const el = ayahRefs.current.get(currentAyahNumber);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
-  }, [currentAyahNumber, currentSurah?.id, surah.id, visibleCount, ayahs.length]);
 
   const toggleBookmark = async (ayahNum: number) => {
     const isSaved = bookmarkedMap[ayahNum];
@@ -460,6 +549,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber
           {/* Chapter Audio Play / Pause Button */}
           <button
             onClick={() => {
+              setIsAutoScrolling(false);
               if (isCurrentSurahPlaying) {
                 togglePlay();
               } else {
@@ -646,11 +736,6 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber
                       }`}>
                         {ayah.ayah}
                       </span>
-                      {isHighlight && (
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 animate-pulse">
-                          Now Playing
-                        </span>
-                      )}
                       {jumpedAyah === ayah.ayah && (
                         <span className="text-[10px] font-bold tracking-wider text-amber-500 animate-pulse">
                           വായിച്ച ഭാഗം (Resumed)
@@ -752,6 +837,35 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber
                 </button>
               </div>
             )}
+
+            {/* Next Chapter Navigation Card (When chapter ends) */}
+            {!hasMore && surah.id < 114 && (
+              <div className="pt-8 pb-14 text-center">
+                <button
+                  onClick={() => {
+                    const allSurahs = surahsData as Surah[];
+                    const next = allSurahs.find(s => s.id === surah.id + 1);
+                    if (next) {
+                      if (onSelectSurah) {
+                        onSelectSurah(next);
+                      }
+                      if (isCurrentSurahPlaying) {
+                        playSurah(next);
+                      }
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                  }}
+                  className="inline-flex items-center gap-2.5 px-6 py-3 rounded-2xl bg-emerald-800 hover:bg-emerald-700 text-amber-300 font-bold text-sm shadow-xl border border-amber-400/50 transition-all active:scale-95"
+                >
+                  <span>
+                    {settings.language === 'ml'
+                      ? `അടുത്ത സൂറത്ത് വായിക്കുക (${(surahsData as Surah[])[surah.id]?.malayalamName || ''})`
+                      : `Next Chapter (${(surahsData as Surah[])[surah.id]?.englishName || ''})`}
+                  </span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -801,27 +915,35 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber
         </div>
       )}
 
-      {/* Floating Assistive Ball (3-sec gentle blink & soft auto-fade) */}
+      {/* Floating Draggable Assistive Ball (Positioned above minimized player & freely draggable) */}
       <div
-        className={`fixed right-3 sm:right-5 bottom-24 z-40 transition-all duration-300 ${
+        ref={ballElemRef}
+        onTouchStart={handleBallTouchStart}
+        onTouchMove={handleBallTouchMove}
+        onTouchEnd={handleBallTouchEnd}
+        onMouseDown={handleBallMouseDown}
+        onMouseEnter={resetFadeTimer}
+        style={
+          ballPos
+            ? { left: `${ballPos.x}px`, top: `${ballPos.y}px`, right: 'auto', bottom: 'auto' }
+            : currentSurah
+            ? { bottom: '125px' }
+            : { bottom: '80px' }
+        }
+        className={`fixed right-3 sm:right-5 z-40 select-none transition-opacity duration-300 touch-none cursor-grab active:cursor-grabbing ${
           isFaded ? 'opacity-35 hover:opacity-100 scale-90' : 'opacity-100 scale-100'
         }`}
-        onMouseEnter={resetFadeTimer}
-        onTouchStart={resetFadeTimer}
       >
         <button
-          onClick={() => {
-            resetFadeTimer();
-            setIsAssistiveOpen(!isAssistiveOpen);
-          }}
-          className={`w-12 h-12 rounded-full flex items-center justify-center shadow-2xl transition-all ${
+          type="button"
+          className={`w-12 h-12 rounded-full flex items-center justify-center shadow-2xl transition-transform ${
             isBlinking ? 'animate-pulse ring-4 ring-amber-400/60' : ''
           } ${
             isAssistiveOpen
               ? 'bg-amber-400 text-emerald-950 rotate-90 scale-105'
               : 'bg-emerald-800 text-amber-300 border-2 border-amber-400/80 hover:scale-105'
           }`}
-          title="Reading Assistant Settings"
+          title="Reading Assistant Settings (Drag to move)"
         >
           {isAssistiveOpen ? (
             <X className="w-6 h-6" />

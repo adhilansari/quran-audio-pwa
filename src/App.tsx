@@ -43,11 +43,29 @@ export const App: React.FC = () => {
   // Listen for custom auto-next event
   useEffect(() => {
     const handleNext = () => {
+      const activeId = currentSurah?.id ?? readerTarget?.surah.id;
+      if (activeId) {
+        const currentIndex = surahs.findIndex(s => s.id === activeId);
+        if (currentIndex >= 0 && currentIndex < surahs.length - 1) {
+          const next = surahs[currentIndex + 1];
+          nextSurah(surahs);
+          if (readerTarget) {
+            setReaderTarget({ surah: next });
+            window.history.replaceState(
+              { view: 'reader', surahId: next.id, tab: currentTab },
+              '',
+              `?surah=${next.id}#${currentTab}`
+            );
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+          return;
+        }
+      }
       nextSurah(surahs);
     };
     window.addEventListener('quran:next-surah', handleNext);
     return () => window.removeEventListener('quran:next-surah', handleNext);
-  }, [surahs, nextSurah]);
+  }, [surahs, nextSurah, currentSurah, readerTarget, currentTab]);
 
   // Check URL on startup for deep links (e.g. ?surah=2&ayah=255) and hash tab (#surahs, etc.)
   useEffect(() => {
@@ -158,6 +176,7 @@ export const App: React.FC = () => {
               surah={readerTarget.surah}
               initialAyahNumber={readerTarget.initialAyah}
               onBack={handleBackFromReader}
+              onSelectSurah={handleOpenReader}
             />
           ) : (
             <div key={currentTab} className="animate-in fade-in duration-150">
