@@ -18,6 +18,15 @@ An aesthetic, production-grade, offline-first Progressive Web App (PWA): a compl
 * **Authentic Typography:** Arabic Uthmani text rendered with the elegant *Amiri* / *Scheherazade New* fonts, paired directly with legible Malayalam script (*Noto Sans Malayalam* / *Manjari*).
 * **Pre-bundled & Cached:** All 114 Surahs are bundled as static JSON data and automatically synced to IndexedDB for 100% offline access.
 * **Progressive Lazy Rendering:** Large chapters (such as Surah Al-Baqarah with 286 verses) load in 0ms with buttery-smooth 60 FPS scrolling through intelligent virtualized chunking.
+* **Auto-Scroll with Speed Controls:** Hands-free reading mode with customizable scroll speeds (`0.5x`, `1.0x`, `1.5x`, `2.0x`, `3.0x`), floating controls, and seamless continuous virtual chunk loading.
+* **Ayah Social Sharing & Card Image Generator:**
+  - Generates high-resolution, ornate Islamic image cards (1080px) on-the-fly with Arabic Uthmani text, Malayalam translation, and reference citation.
+  - Native Web Share API integration: shares directly to **WhatsApp, Instagram Stories, Telegram, Facebook**, etc.
+  - One-tap clipboard copy for both the generated card image and formatted text.
+* **Recent Reading History (Last 10 Surahs & Exact Ayah):**
+  - Automatically records your reading position as you scroll.
+  - Displays your last 10 read Surahs on the Home page with progress bars and exact verse numbers.
+  - One-tap resume instantly opens the chapter and jumps directly to that verse with a highlight ring.
 * **Reading Customization:**
   - Independent font size sliders for both Arabic and Malayalam.
   - Toggles to show/hide Arabic text or Malayalam translation.

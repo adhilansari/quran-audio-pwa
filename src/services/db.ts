@@ -5,7 +5,7 @@
 
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
 import { APP_CONFIG } from '@/config';
-import { Bookmark, DownloadTask, PlayHistory, AppSettings, Ayah } from '@/types';
+import { Bookmark, DownloadTask, PlayHistory, AppSettings, Ayah, ReadingHistoryItem } from '@/types';
 
 interface QuranAudioDB extends DBSchema {
   settings: {
@@ -225,5 +225,40 @@ export async function saveCachedTranslation(surahId: number, ayahs: any[]): Prom
     });
   } catch (e) {
     console.error('Error saving translation to cache:', e);
+  }
+}
+
+// ---------------- Reading History API (Recent 10 Surahs with exact Ayah) ----------------
+const READING_HISTORY_KEY = 'recent_reading_history_v1';
+
+export async function getReadingHistory(): Promise<ReadingHistoryItem[]> {
+  try {
+    const items = await getSetting<ReadingHistoryItem[]>(READING_HISTORY_KEY, []);
+    return Array.isArray(items) ? items : [];
+  } catch (e) {
+    console.error('Error reading history:', e);
+    return [];
+  }
+}
+
+export async function saveReadingHistory(item: ReadingHistoryItem): Promise<void> {
+  try {
+    const current = await getReadingHistory();
+    // Filter out existing record for this surah so it moves to top with latest ayah
+    const filtered = current.filter(h => h.surahId !== item.surahId);
+    const updated = [item, ...filtered].slice(0, 10); // Keep max 10 entries
+    await saveSetting(READING_HISTORY_KEY, updated);
+  } catch (e) {
+    console.error('Error saving reading history:', e);
+  }
+}
+
+export async function deleteReadingHistoryItem(surahId: number): Promise<void> {
+  try {
+    const current = await getReadingHistory();
+    const filtered = current.filter(h => h.surahId !== surahId);
+    await saveSetting(READING_HISTORY_KEY, filtered);
+  } catch (e) {
+    console.error('Error removing reading history item:', e);
   }
 }

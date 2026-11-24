@@ -13,20 +13,25 @@ import {
   Volume2,
   Copy,
   Check,
-  ChevronDown
+  ChevronDown,
+  Share2,
+  ChevronsDown,
+  X
 } from 'lucide-react';
 import { Surah, Ayah } from '@/types';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useAudio } from '@/contexts/AudioContext';
-import { isBookmarked, addBookmark, removeBookmark } from '@/services/db';
+import { isBookmarked, addBookmark, removeBookmark, saveReadingHistory } from '@/services/db';
 import { loadSurahAyahs } from '@/services/translationService';
+import { AyahShareModal } from '@/components/AyahShareModal';
 
 interface ReaderViewProps {
   surah: Surah;
+  initialAyahNumber?: number;
   onBack: () => void;
 }
 
-export const ReaderView: React.FC<ReaderViewProps> = ({ surah, onBack }) => {
+export const ReaderView: React.FC<ReaderViewProps> = ({ surah, initialAyahNumber, onBack }) => {
   const { settings, updateSetting, t } = useSettings();
   const {
     currentSurah,
@@ -43,9 +48,16 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, onBack }) => {
   const [bookmarkedMap, setBookmarkedMap] = useState<Record<number, boolean>>({});
   const [showTypographyControls, setShowTypographyControls] = useState(false);
   const [copiedAyah, setCopiedAyah] = useState<number | null>(null);
+  const [shareTargetAyah, setShareTargetAyah] = useState<Ayah | null>(null);
+  const [jumpedAyah, setJumpedAyah] = useState<number | null>(null);
 
   // Progressive Lazy Loading for large chapters (e.g. Al-Baqarah 286 ayahs)
-  const [visibleCount, setVisibleCount] = useState(30);
+  const [visibleCount, setVisibleCount] = useState(initialAyahNumber ? Math.max(35, initialAyahNumber + 10) : 35);
+
+  // Auto-scroll states & speed controls (0.5x, 1x, 1.5x, 2x, 3x)
+  const [isAutoScrolling, setIsAutoScrolling] = useState(false);
+  const [autoScrollSpeed, setAutoScrollSpeed] = useState<number>(1.0);
+  const animationFrameRef = useRef<number | null>(null);
 
   // Ayah-level single recitation audio
   const [playingAyahNum, setPlayingAyahNum] = useState<number | null>(null);
@@ -56,7 +68,11 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, onBack }) => {
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
-    setVisibleCount(35);
+    if (initialAyahNumber) {
+      setVisibleCount(Math.max(35, initialAyahNumber + 10));
+    } else {
+      setVisibleCount(35);
+    }
 
     async function load() {
       try {
@@ -86,8 +102,113 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, onBack }) => {
         ayahAudioRef.current.pause();
         ayahAudioRef.current = null;
       }
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
-  }, [surah.id]);
+  }, [surah.id, initialAyahNumber]);
+
+  // Jump to initial ayah if passed from Reading History
+  useEffect(() => {
+    if (!loading && initialAyahNumber && ayahs.length > 0) {
+      const timer = setTimeout(() => {
+        const el = ayahRefs.current.get(initialAyahNumber);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setJumpedAyah(initialAyahNumber);
+          setTimeout(() => setJumpedAyah(null), 3500);
+        }
+      }, 350);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, initialAyahNumber, ayahs.length]);
+
+  // Reading history tracking on scroll
+  useEffect(() => {
+    let scrollTimeout: any = null;
+
+    const handleScroll = () => {
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        // Find visible ayah closest to viewport top/center
+        const viewportMid = window.innerHeight * 0.35;
+        let closestAyah = 1;
+        let minDiff = Infinity;
+
+        ayahRefs.current.forEach((el, ayahNum) => {
+          const rect = el.getBoundingClientRect();
+          const diff = Math.abs(rect.top - viewportMid);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestAyah = ayahNum;
+          }
+        });
+
+        if (closestAyah > 0) {
+          saveReadingHistory({
+            surahId: surah.id,
+            ayahNumber: closestAyah,
+            surahNameMalayalam: surah.malayalamName,
+            surahNameEnglish: surah.englishName,
+            surahTotalAyahs: surah.ayahCount,
+            readAt: Date.now()
+          });
+        }
+      }, 500);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+    };
+  }, [surah]);
+
+  // Auto-scroll loop with speed customization
+  useEffect(() => {
+    if (!isAutoScrolling) {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      return;
+    }
+
+    let lastTime = performance.now();
+
+    const scrollStep = (now: number) => {
+      const delta = (now - lastTime) / 1000;
+      lastTime = now;
+
+      // Base 32 pixels/second * multiplier (0.5x, 1x, 1.5x, 2x, 3x)
+      const pixelsToScroll = Math.max(0.5, autoScrollSpeed * 32 * delta);
+      window.scrollBy(0, pixelsToScroll);
+
+      // Expand visibleCount progressively before hitting bottom
+      const scrollBottom = window.innerHeight + window.scrollY;
+      const docHeight = document.documentElement.scrollHeight;
+      if (docHeight - scrollBottom < 500 && visibleCount < ayahs.length) {
+        setVisibleCount(prev => Math.min(ayahs.length, prev + 25));
+      }
+
+      // Check if reached very bottom of chapter
+      if (docHeight - scrollBottom <= 2 && visibleCount >= ayahs.length) {
+        setIsAutoScrolling(false);
+        return;
+      }
+
+      animationFrameRef.current = requestAnimationFrame(scrollStep);
+    };
+
+    animationFrameRef.current = requestAnimationFrame(scrollStep);
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+    };
+  }, [isAutoScrolling, autoScrollSpeed, visibleCount, ayahs.length]);
 
   // Smooth scroll into view when active ayah changes (if chapter timings exist)
   useEffect(() => {
@@ -198,6 +319,21 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, onBack }) => {
 
         {/* Action icons */}
         <div className="flex items-center gap-1.5">
+          {/* Auto-Scroll Toggle */}
+          <button
+            onClick={() => setIsAutoScrolling(!isAutoScrolling)}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
+              isAutoScrolling
+                ? 'bg-amber-400 text-emerald-950 border-amber-300 font-bold shadow-xs'
+                : 'border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-emerald-950'
+            }`}
+            title="Auto-Scroll"
+          >
+            <ChevronsDown className={`w-3.5 h-3.5 ${isAutoScrolling ? 'animate-bounce text-emerald-950' : 'text-amber-500'}`} />
+            <span className="hidden sm:inline">Auto-Scroll</span>
+            <span className="text-[10px] opacity-80">{autoScrollSpeed}x</span>
+          </button>
+
           {/* Typography Controls Toggle */}
           <button
             onClick={() => setShowTypographyControls(!showTypographyControls)}
@@ -385,13 +521,19 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, onBack }) => {
                   className={`rounded-2xl p-4 transition-all duration-300 border ${
                     isHighlight
                       ? 'bg-amber-50 dark:bg-emerald-950/80 border-amber-400 dark:border-amber-400/80 shadow-md ring-2 ring-amber-400/20'
+                      : jumpedAyah === ayah.ayah
+                      ? 'bg-amber-50/70 dark:bg-emerald-950/90 border-amber-500 ring-4 ring-amber-400/40 shadow-xl scale-[1.01]'
                       : 'bg-white dark:bg-[#12201c] border-stone-200 dark:border-emerald-950/70 hover:border-emerald-300 dark:hover:border-emerald-900'
                   }`}
                 >
                   {/* Ayah Header Row */}
                   <div className="flex items-center justify-between pb-2 mb-2 border-b border-stone-100 dark:border-emerald-950">
                     <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-amber-300 font-bold text-xs flex items-center justify-center">
+                      <span className={`w-6 h-6 rounded-full font-bold text-xs flex items-center justify-center ${
+                        jumpedAyah === ayah.ayah
+                          ? 'bg-amber-400 text-emerald-950 font-black'
+                          : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-amber-300'
+                      }`}>
                         {ayah.ayah}
                       </span>
                       {isHighlight && (
@@ -399,9 +541,14 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, onBack }) => {
                           Now Playing
                         </span>
                       )}
+                      {jumpedAyah === ayah.ayah && (
+                        <span className="text-[10px] font-bold tracking-wider text-amber-500 animate-pulse">
+                          വായിച്ച ഭാഗം (Resumed)
+                        </span>
+                      )}
                     </div>
 
-                    {/* Actions: Play Ayah, Copy, Bookmark */}
+                    {/* Actions: Play Ayah, Share Image, Copy, Bookmark */}
                     <div className="flex items-center gap-1">
                       {/* Play Single Ayah Recitation */}
                       <button
@@ -418,6 +565,15 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, onBack }) => {
                         ) : (
                           <Volume2 className="w-3.5 h-3.5" />
                         )}
+                      </button>
+
+                      {/* Share Ayah (Image or Text) */}
+                      <button
+                        onClick={() => setShareTargetAyah(ayah)}
+                        className="p-1.5 text-stone-400 hover:text-emerald-700 dark:hover:text-amber-400 rounded-lg transition-colors"
+                        title="Share Ayah Image or Text"
+                      >
+                        <Share2 className="w-3.5 h-3.5" />
                       </button>
 
                       {/* Copy Ayah */}
@@ -489,6 +645,57 @@ export const ReaderView: React.FC<ReaderViewProps> = ({ surah, onBack }) => {
           </>
         )}
       </div>
+
+      {/* Floating Auto-Scroll Control Pill (Visible when auto-scroll is active) */}
+      {isAutoScrolling && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 bg-emerald-950/95 text-white backdrop-blur-md px-3.5 py-2 rounded-2xl shadow-2xl border border-amber-400/40 flex items-center gap-2.5 animate-in slide-in-from-bottom-3 duration-200">
+          <button
+            onClick={() => setIsAutoScrolling(!isAutoScrolling)}
+            className="w-7 h-7 rounded-xl bg-amber-400 text-emerald-950 flex items-center justify-center font-bold shadow-xs hover:bg-amber-300 transition-colors"
+            title="Pause auto-scroll"
+          >
+            <Pause className="w-3.5 h-3.5 fill-current" />
+          </button>
+
+          <span className="text-[11px] font-bold text-amber-300 hidden sm:inline">
+            സ്ക്രോൾ വേഗത:
+          </span>
+
+          <div className="flex items-center gap-1 bg-emerald-900/70 p-0.5 rounded-xl border border-emerald-800">
+            {[0.5, 1.0, 1.5, 2.0, 3.0].map((spd) => (
+              <button
+                key={spd}
+                onClick={() => setAutoScrollSpeed(spd)}
+                className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition-all ${
+                  autoScrollSpeed === spd
+                    ? 'bg-amber-400 text-emerald-950 shadow-xs'
+                    : 'text-emerald-200 hover:text-white'
+                }`}
+              >
+                {spd}x
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={() => setIsAutoScrolling(false)}
+            className="p-1 text-emerald-300 hover:text-white transition-colors"
+            title="Close auto-scroll"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Ayah Share & Export Modal */}
+      {shareTargetAyah && (
+        <AyahShareModal
+          surah={surah}
+          ayah={shareTargetAyah}
+          isOpen={!!shareTargetAyah}
+          onClose={() => setShareTargetAyah(null)}
+        />
+      )}
     </div>
   );
 };

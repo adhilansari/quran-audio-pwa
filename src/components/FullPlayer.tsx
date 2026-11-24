@@ -20,7 +20,7 @@ import { RepeatMode, Surah } from '@/types';
 
 interface FullPlayerProps {
   surahs: Surah[];
-  onOpenReader?: (surah: Surah) => void;
+  onOpenReader?: (surah: Surah, initialAyah?: number) => void;
 }
 
 export const FullPlayer: React.FC<FullPlayerProps> = ({ surahs, onOpenReader }) => {
@@ -28,6 +28,7 @@ export const FullPlayer: React.FC<FullPlayerProps> = ({ surahs, onOpenReader }) 
     currentSurah,
     isPlaying,
     isLoading,
+    currentAyahNumber,
     currentTime,
     duration,
     playbackSpeed,
@@ -93,7 +94,7 @@ export const FullPlayer: React.FC<FullPlayerProps> = ({ surahs, onOpenReader }) 
           <button
             onClick={() => {
               closeFullPlayer();
-              onOpenReader(currentSurah);
+              onOpenReader(currentSurah, currentAyahNumber || 1);
             }}
             className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-emerald-800/80 hover:bg-emerald-700 text-amber-300 text-xs font-semibold shadow transition-all"
             title="Read Translation"

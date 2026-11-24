@@ -1,14 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, BookOpen, Clock, Sparkles, ChevronRight, DownloadCloud, Volume2, Loader2 } from 'lucide-react';
-import { Surah, PlayHistory } from '@/types';
+import {
+  Play,
+  Pause,
+  BookOpen,
+  Clock,
+  Sparkles,
+  ChevronRight,
+  DownloadCloud,
+  Volume2,
+  Loader2,
+  Bookmark,
+  History,
+  CheckCircle2
+} from 'lucide-react';
+import { Surah, PlayHistory, ReadingHistoryItem } from '@/types';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useAudio } from '@/contexts/AudioContext';
-import { getPlayHistory } from '@/services/db';
+import { getPlayHistory, getReadingHistory } from '@/services/db';
 
 interface HomeViewProps {
   surahs: Surah[];
   onSelectSurah: (surah: Surah) => void;
-  onOpenReader: (surah: Surah) => void;
+  onOpenReader: (surah: Surah, initialAyah?: number) => void;
   onNavigateTab: (tab: any) => void;
 }
 
@@ -21,15 +34,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const { settings, t } = useSettings();
   const { playSurah, togglePlay, currentSurah, isPlaying, isLoading } = useAudio();
   const [lastHistory, setLastHistory] = useState<PlayHistory | null>(null);
+  const [readingHistory, setReadingHistory] = useState<ReadingHistoryItem[]>([]);
 
   useEffect(() => {
-    async function loadHistory() {
+    async function loadData() {
       const history = await getPlayHistory();
       if (history.length > 0) {
         setLastHistory(history[0]);
       }
+      const readHist = await getReadingHistory();
+      setReadingHistory(readHist);
     }
-    loadHistory();
+    loadData();
   }, [isPlaying]);
 
   const lastPlayedSurah = lastHistory ? surahs.find(s => s.id === lastHistory.surahId) : null;
@@ -63,7 +79,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <button
               onClick={() => {
                 const s2 = surahs.find(s => s.id === 2);
-                if (s2) onOpenReader(s2);
+                if (s2) onOpenReader(s2, 286);
               }}
               className="text-amber-300 font-semibold hover:underline flex items-center gap-0.5"
             >
@@ -74,7 +90,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </div>
 
-      {/* Continue Listening Card (if history exists) */}
+      {/* Continue Listening Card (Audio history) */}
       {lastPlayedSurah && (
         <div className="bg-white dark:bg-[#12201c] rounded-2xl border border-stone-200 dark:border-emerald-950 p-4 shadow-sm flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
@@ -113,6 +129,75 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <Play className="w-4 h-4 fill-current ml-0.5" />
             )}
           </button>
+        </div>
+      )}
+
+      {/* Recent Reading History (Last 10 Surahs with exact last Ayah) */}
+      {readingHistory.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between px-1">
+            <h2 className="text-sm font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
+              <History className="w-4 h-4 text-emerald-700 dark:text-amber-400" />
+              <span>അവസാനം വായിച്ചവ (Recent Reading)</span>
+            </h2>
+            <span className="text-[11px] font-semibold text-stone-400">
+              {readingHistory.length} സൂറത്തുകൾ
+            </span>
+          </div>
+
+          <div className="space-y-2">
+            {readingHistory.slice(0, 10).map((item) => {
+              const matchedSurah = surahs.find(s => s.id === item.surahId);
+              if (!matchedSurah) return null;
+              const progressPct = Math.min(100, Math.round((item.ayahNumber / item.surahTotalAyahs) * 100));
+
+              return (
+                <div
+                  key={item.surahId}
+                  onClick={() => onOpenReader(matchedSurah, item.ayahNumber)}
+                  className="bg-white dark:bg-[#12201c] rounded-2xl border border-stone-200 dark:border-emerald-950 p-3.5 hover:border-amber-400/60 dark:hover:border-amber-400/40 cursor-pointer shadow-xs transition-all flex items-center justify-between gap-3 group"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/70 text-emerald-800 dark:text-amber-400 border border-emerald-200 dark:border-emerald-900 flex items-center justify-center font-bold text-sm flex-shrink-0 group-hover:scale-105 transition-transform">
+                      {matchedSurah.number}
+                    </div>
+
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-sm font-bold text-stone-900 dark:text-stone-100 truncate group-hover:text-emerald-700 dark:group-hover:text-amber-300 transition-colors">
+                          {settings.language === 'ml' ? matchedSurah.malayalamName : matchedSurah.englishName}
+                        </h4>
+                        <span className="text-[11px] text-stone-400 font-arabic">
+                          {matchedSurah.nameArabic}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400">
+                          ആയത്ത് {item.ayahNumber} / {item.surahTotalAyahs}
+                        </span>
+                        <span className="text-[10px] text-stone-400">({progressPct}%)</span>
+                      </div>
+
+                      {/* Reading Progress Bar */}
+                      <div className="w-36 max-w-full h-1 bg-stone-100 dark:bg-emerald-950 rounded-full mt-1.5 overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-emerald-600 to-amber-400 rounded-full transition-all"
+                          style={{ width: `${progressPct}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Resume Reading Button */}
+                  <div className="flex items-center gap-1 text-xs font-bold text-emerald-700 dark:text-amber-300 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-900 px-3 py-1.5 rounded-xl transition-all flex-shrink-0 group-hover:shadow-xs">
+                    <span>തുടരുക</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 

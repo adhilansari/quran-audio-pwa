@@ -60,6 +60,15 @@ export interface PlayHistory {
   lastPlayedAt: number;
 }
 
+export interface ReadingHistoryItem {
+  surahId: number;
+  ayahNumber: number;
+  surahNameMalayalam: string;
+  surahNameEnglish: string;
+  surahTotalAyahs: number;
+  readAt: number;
+}
+
 export type ThemeMode = 'system' | 'light' | 'dark' | 'sepia' | 'midnight';
 export type UILanguage = 'ml' | 'en';
 export type RepeatMode = 'off' | 'surah' | 'all';

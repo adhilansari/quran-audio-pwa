@@ -29,7 +29,7 @@ export const App: React.FC = () => {
   const { currentSurah, errorMessage, clearError, nextSurah } = useAudio();
 
   const [currentTab, setCurrentTab] = useState<NavTab>('home');
-  const [selectedSurahForReader, setSelectedSurahForReader] = useState<Surah | null>(null);
+  const [readerTarget, setReaderTarget] = useState<{ surah: Surah; initialAyah?: number } | null>(null);
   const [activeDownloadsCount, setActiveDownloadsCount] = useState(0);
 
   // Monitor active downloads count for badge
@@ -49,12 +49,12 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('quran:next-surah', handleNext);
   }, [surahs, nextSurah]);
 
-  const handleOpenReader = (surah: Surah) => {
-    setSelectedSurahForReader(surah);
+  const handleOpenReader = (surah: Surah, initialAyah?: number) => {
+    setReaderTarget({ surah, initialAyah });
   };
 
   const handleBackFromReader = () => {
-    setSelectedSurahForReader(null);
+    setReaderTarget(null);
   };
 
   return (
@@ -78,14 +78,18 @@ export const App: React.FC = () => {
       {/* Main Content Area with Suspense Lazy Loading */}
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 py-4 pb-32">
         <Suspense fallback={<PageLoader />}>
-          {selectedSurahForReader ? (
-            <ReaderView surah={selectedSurahForReader} onBack={handleBackFromReader} />
+          {readerTarget ? (
+            <ReaderView
+              surah={readerTarget.surah}
+              initialAyahNumber={readerTarget.initialAyah}
+              onBack={handleBackFromReader}
+            />
           ) : (
             <>
               {currentTab === 'home' && (
                 <HomeView
                   surahs={surahs}
-                  onSelectSurah={(s) => setSelectedSurahForReader(s)}
+                  onSelectSurah={(s) => setReaderTarget({ surah: s })}
                   onOpenReader={handleOpenReader}
                   onNavigateTab={(t) => setCurrentTab(t)}
                 />
@@ -116,7 +120,7 @@ export const App: React.FC = () => {
       <FullPlayer surahs={surahs} onOpenReader={handleOpenReader} />
 
       {/* Bottom Navigation Bar */}
-      {!selectedSurahForReader && (
+      {!readerTarget && (
         <BottomNav
           currentTab={currentTab}
           onTabChange={(tab) => {
