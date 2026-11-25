@@ -5,7 +5,6 @@ import {
   Pause,
   Bookmark,
   BookmarkCheck,
-  Type,
   Eye,
   EyeOff,
   RotateCcw,
@@ -59,7 +58,6 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
   const [ayahs, setAyahs] = useState<Ayah[]>([]);
   const [loading, setLoading] = useState(true);
   const [bookmarkedMap, setBookmarkedMap] = useState<Record<number, boolean>>({});
-  const [showTypographyControls, setShowTypographyControls] = useState(false);
   const [copiedAyah, setCopiedAyah] = useState<number | null>(null);
   const [shareTargetAyah, setShareTargetAyah] = useState<Ayah | null>(null);
   const [jumpedAyah, setJumpedAyah] = useState<number | null>(null);
@@ -67,7 +65,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
   // Progressive Lazy Loading for large chapters (e.g. Al-Baqarah 286 ayahs)
   const [visibleCount, setVisibleCount] = useState(initialAyahNumber ? Math.max(35, initialAyahNumber + 10) : 35);
 
-  // Auto-scroll states & speed controls (0.5x to 3.0x)
+  // Auto-scroll states & speed controls (0.1x to 3.0x)
   const [isAutoScrolling, setIsAutoScrolling] = useState(false);
   const [autoScrollSpeed, setAutoScrollSpeed] = useState<number>(1.0);
   const animationFrameRef = useRef<number | null>(null);
@@ -78,9 +76,31 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
   const [isBlinking, setIsBlinking] = useState(true);
   const [jumpInputAyah, setJumpInputAyah] = useState('');
   const fadeTimeoutRef = useRef<any>(null);
+  const openTimestampRef = useRef<number>(0);
 
-  // Draggable Assistive Ball position state
-  const [ballPos, setBallPos] = useState<{ x: number; y: number } | null>(null);
+  // Draggable Assistive Ball position state (persisted across views & refresh in localStorage)
+  const [ballPos, setBallPos] = useState<{ x: number; y: number } | null>(() => {
+    try {
+      const saved = localStorage.getItem('quran_assistive_ball_pos');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (typeof parsed.x === 'number' && typeof parsed.y === 'number') {
+          const safeX = Math.max(10, Math.min(window.innerWidth - 60, parsed.x));
+          const safeY = Math.max(70, Math.min(window.innerHeight - 80, parsed.y));
+          return { x: safeX, y: safeY };
+        }
+      }
+    } catch {}
+    return null;
+  });
+
+  const saveBallPos = (pos: { x: number; y: number }) => {
+    setBallPos(pos);
+    try {
+      localStorage.setItem('quran_assistive_ball_pos', JSON.stringify(pos));
+    } catch {}
+  };
+
   const dragInfoRef = useRef<{
     startX: number;
     startY: number;
@@ -122,10 +142,17 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
     }
   };
 
-  const handleBallTouchEnd = () => {
+  const handleBallTouchEnd = (e: React.TouchEvent) => {
     if (dragInfoRef.current) {
       if (!dragInfoRef.current.hasDragged) {
+        e.preventDefault(); // Stop synthetic mouse click bleed into modal sheet
+        openTimestampRef.current = Date.now();
         setIsAssistiveOpen(prev => !prev);
+      } else {
+        const rect = ballElemRef.current?.getBoundingClientRect();
+        if (rect) {
+          saveBallPos({ x: rect.left, y: rect.top });
+        }
       }
       dragInfoRef.current = null;
     }
@@ -160,7 +187,13 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
       const handleMouseUp = () => {
         if (dragInfoRef.current) {
           if (!dragInfoRef.current.hasDragged) {
+            openTimestampRef.current = Date.now();
             setIsAssistiveOpen(prev => !prev);
+          } else {
+            const rect = ballElemRef.current?.getBoundingClientRect();
+            if (rect) {
+              saveBallPos({ x: rect.left, y: rect.top });
+            }
           }
           dragInfoRef.current = null;
         }
@@ -541,18 +574,6 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
             <span className="text-[10px] opacity-80">{autoScrollSpeed}x</span>
           </button>
 
-          {/* Typography Controls Toggle */}
-          <button
-            onClick={() => setShowTypographyControls(!showTypographyControls)}
-            className={`p-2 rounded-lg border text-xs font-semibold transition-all ${showTypographyControls
-              ? 'bg-emerald-800 text-amber-300 border-emerald-700'
-              : 'border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-emerald-950'
-              }`}
-            title="Adjust Fonts"
-          >
-            <Type className="w-4 h-4" />
-          </button>
-
           {/* Chapter Audio Play / Pause Button */}
           <button
             onClick={() => {
@@ -585,112 +606,6 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
           </button>
         </div>
       </div>
-
-      {/* Typography and Visibility Popover Bar */}
-      {showTypographyControls && (
-        <div className="bg-stone-100 dark:bg-[#12201c] border-b border-stone-200 dark:border-emerald-950 px-4 py-3 animate-in slide-in-from-top-2 duration-150">
-          <div className="max-w-2xl mx-auto space-y-3">
-            {/* Arabic Font Presets */}
-            <div>
-              <div className="flex justify-between text-xs font-semibold text-stone-600 dark:text-stone-300 mb-1.5">
-                <span>{t('arabicSize')}</span>
-                <span className="font-bold text-emerald-700 dark:text-amber-400">
-                  {settings.arabicFontSize <= 24 ? (settings.language === 'ml' ? 'ചെറുത്' : 'Small') :
-                    settings.arabicFontSize <= 28 ? (settings.language === 'ml' ? 'സാധാരണം' : 'Normal') :
-                      settings.arabicFontSize <= 32 ? (settings.language === 'ml' ? 'ഇടത്തരം' : 'Medium') :
-                        settings.arabicFontSize <= 36 ? (settings.language === 'ml' ? 'വലുത്' : 'Large') :
-                          (settings.language === 'ml' ? 'വളരെ വലുത്' : 'Huge')}
-                </span>
-              </div>
-              <div className="grid grid-cols-5 gap-1.5">
-                {[
-                  { size: 24, labelMl: 'ചെറുത്', labelEn: 'Small' },
-                  { size: 28, labelMl: 'സാധാരണം', labelEn: 'Normal' },
-                  { size: 32, labelMl: 'ഇടത്തരം', labelEn: 'Medium' },
-                  { size: 36, labelMl: 'വലുത്', labelEn: 'Large' },
-                  { size: 42, labelMl: 'കൂടുതൽ', labelEn: 'Huge' }
-                ].map(opt => (
-                  <button
-                    key={opt.size}
-                    onClick={() => {
-                      if ('vibrate' in navigator) navigator.vibrate(8);
-                      updateSetting('arabicFontSize', opt.size);
-                    }}
-                    className={`py-1.5 px-1 rounded-xl text-center text-xs font-bold transition-all border ${settings.arabicFontSize === opt.size
-                      ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs scale-102'
-                      : 'bg-white dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-300 hover:bg-stone-50'
-                      }`}
-                  >
-                    {settings.language === 'ml' ? opt.labelMl : opt.labelEn}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Malayalam Font Presets */}
-            <div>
-              <div className="flex justify-between text-xs font-semibold text-stone-600 dark:text-stone-300 mb-1.5">
-                <span>{t('malayalamSize')}</span>
-                <span className="font-bold text-emerald-700 dark:text-amber-400">
-                  {settings.malayalamFontSize <= 14 ? (settings.language === 'ml' ? 'ചെറുത്' : 'Small') :
-                    settings.malayalamFontSize <= 16 ? (settings.language === 'ml' ? 'സാധാരണം' : 'Normal') :
-                      settings.malayalamFontSize <= 18 ? (settings.language === 'ml' ? 'ഇടത്തരം' : 'Medium') :
-                        settings.malayalamFontSize <= 20 ? (settings.language === 'ml' ? 'വലുത്' : 'Large') :
-                          (settings.language === 'ml' ? 'വളരെ വലുത്' : 'Huge')}
-                </span>
-              </div>
-              <div className="grid grid-cols-5 gap-1.5">
-                {[
-                  { size: 14, labelMl: 'ചെറുത്', labelEn: 'Small' },
-                  { size: 16, labelMl: 'സാധാരണം', labelEn: 'Normal' },
-                  { size: 18, labelMl: 'ഇടത്തരം', labelEn: 'Medium' },
-                  { size: 20, labelMl: 'വലുത്', labelEn: 'Large' },
-                  { size: 22, labelMl: 'കൂടുതൽ', labelEn: 'Huge' }
-                ].map(opt => (
-                  <button
-                    key={opt.size}
-                    onClick={() => {
-                      if ('vibrate' in navigator) navigator.vibrate(8);
-                      updateSetting('malayalamFontSize', opt.size);
-                    }}
-                    className={`py-1.5 px-1 rounded-xl text-center text-xs font-bold transition-all border ${settings.malayalamFontSize === opt.size
-                      ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs scale-102'
-                      : 'bg-white dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-300 hover:bg-stone-50'
-                      }`}
-                  >
-                    {settings.language === 'ml' ? opt.labelMl : opt.labelEn}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* View Toggles */}
-            <div className="flex items-center justify-between pt-2 border-t border-stone-200 dark:border-emerald-900/60 text-xs">
-              <button
-                onClick={() => {
-                  if ('vibrate' in navigator) navigator.vibrate(8);
-                  updateSetting('showArabic', !settings.showArabic);
-                }}
-                className="flex items-center gap-1.5 text-stone-700 dark:text-stone-300 font-medium"
-              >
-                {settings.showArabic ? <Eye className="w-3.5 h-3.5 text-emerald-600" /> : <EyeOff className="w-3.5 h-3.5 text-stone-400" />}
-                <span>{t('showArabicText')}</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  if ('vibrate' in navigator) navigator.vibrate(8);
-                  updateSetting('showMalayalam', !settings.showMalayalam);
-                }}
-                className="flex items-center gap-1.5 text-stone-700 dark:text-stone-300 font-medium"
-              >
-                {settings.showMalayalam ? <Eye className="w-3.5 h-3.5 text-emerald-600" /> : <EyeOff className="w-3.5 h-3.5 text-stone-400" />}
-                <span>{t('showMalayalamText')}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Chapter Title Card */}
       <div className="max-w-2xl mx-auto px-4 pt-5 pb-3">
@@ -763,7 +678,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                     if (el) ayahRefs.current.set(ayah.ayah, el);
                     else ayahRefs.current.delete(ayah.ayah);
                   }}
-                  className={`rounded-2xl p-4 transition-all duration-300 border ${isPlayingThisAyah
+                  className={`ayah-card rounded-2xl p-4 transition-all duration-300 border ${isPlayingThisAyah
                     ? 'bg-amber-50 dark:bg-emerald-950/80 border-amber-400 dark:border-amber-400/80 shadow-md ring-2 ring-amber-400/20'
                     : jumpedAyah === ayah.ayah
                       ? 'bg-amber-50/70 dark:bg-emerald-950/90 border-amber-500 ring-4 ring-amber-400/40 shadow-xl scale-[1.01]'
@@ -1059,6 +974,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                     <button
                       key={spd}
                       onClick={() => {
+                        if (Date.now() - openTimestampRef.current < 250) return;
                         if ('vibrate' in navigator) navigator.vibrate(8);
                         setAutoScrollSpeed(spd);
                       }}
@@ -1097,6 +1013,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                   <button
                     key={th.id}
                     onClick={() => {
+                      if (Date.now() - openTimestampRef.current < 250) return;
                       if ('vibrate' in navigator) navigator.vibrate(8);
                       updateSetting('theme', th.id as ThemeMode);
                     }}
@@ -1112,7 +1029,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
               </div>
             </div>
 
-            {/* 3. Typography Adjustments (Discrete Named Sizes) */}
+            {/* 3. Typography Adjustments (Discrete Named Sizes + Live Preview) */}
             <div className="space-y-3 pt-1">
               {/* Arabic Font Options */}
               <div className="space-y-1.5">
@@ -1135,6 +1052,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                     <button
                       key={size.val}
                       onClick={() => {
+                        if (Date.now() - openTimestampRef.current < 250) return;
                         if ('vibrate' in navigator) navigator.vibrate(8);
                         updateSetting('arabicFontSize', size.val);
                       }}
@@ -1170,6 +1088,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                     <button
                       key={size.val}
                       onClick={() => {
+                        if (Date.now() - openTimestampRef.current < 250) return;
                         if ('vibrate' in navigator) navigator.vibrate(8);
                         updateSetting('malayalamFontSize', size.val);
                       }}
@@ -1182,6 +1101,35 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Live Typography Preview Card */}
+              <div className="p-3 rounded-2xl bg-stone-100 dark:bg-emerald-950/60 border border-stone-200 dark:border-emerald-900/80 space-y-2 shadow-inner">
+                <div className="flex items-center justify-between text-[11px] font-bold text-stone-500 dark:text-stone-400">
+                  <span className="flex items-center gap-1">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    <span>{settings.language === 'ml' ? 'തത്സമയ പ്രിവ്യൂ' : 'Live Preview'}</span>
+                  </span>
+                  <span className="text-amber-600 dark:text-amber-400 font-mono text-[10px]">
+                    Arabic {settings.arabicFontSize}px • ML {settings.malayalamFontSize}px
+                  </span>
+                </div>
+                {settings.showArabic && (
+                  <p
+                    className="font-arabic text-stone-900 dark:text-stone-100 text-right leading-relaxed"
+                    style={{ fontSize: `${settings.arabicFontSize}px` }}
+                  >
+                    بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+                  </p>
+                )}
+                {settings.showMalayalam && (
+                  <p
+                    className="text-stone-700 dark:text-stone-300 font-malayalam leading-normal"
+                    style={{ fontSize: `${settings.malayalamFontSize}px` }}
+                  >
+                    പരമകാരുണികനും കരുണാനിധിയുമായ അല്ലാഹുവിന്റെ നാമത്തിൽ.
+                  </p>
+                )}
               </div>
             </div>
 

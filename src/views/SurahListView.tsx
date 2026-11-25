@@ -162,7 +162,7 @@ export const SurahListView: React.FC<SurahListViewProps> = ({ surahs, onOpenRead
             return (
               <div
                 key={surah.id}
-                className={`rounded-2xl p-3.5 transition-all duration-200 border bg-white dark:bg-[#12201c] shadow-sm flex items-center justify-between gap-3 ${
+                className={`surah-card rounded-2xl p-3.5 transition-all duration-200 border bg-white dark:bg-[#12201c] shadow-sm flex items-center justify-between gap-3 ${
                   isPlayingThis
                     ? 'border-amber-400 dark:border-amber-400/80 ring-1 ring-amber-400/30'
                     : 'border-stone-200 dark:border-emerald-950/70 hover:border-emerald-300 dark:hover:border-emerald-900'

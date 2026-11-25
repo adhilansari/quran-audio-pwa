@@ -264,7 +264,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div
               key={surah.id}
               onClick={() => onOpenReader(surah)}
-              className="bg-white dark:bg-[#12201c] rounded-2xl border border-stone-200 dark:border-emerald-950 p-3.5 hover:border-emerald-400 dark:hover:border-emerald-800 cursor-pointer shadow-sm transition-all"
+              className="surah-card bg-white dark:bg-[#12201c] rounded-2xl border border-stone-200 dark:border-emerald-950 p-3.5 hover:border-emerald-400 dark:hover:border-emerald-800 cursor-pointer shadow-sm transition-all"
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-amber-300 font-bold text-xs flex items-center justify-center">

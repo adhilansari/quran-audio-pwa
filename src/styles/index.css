@@ -266,3 +266,34 @@ input[type="range"] {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* High-Performance optimizations for smooth 60/120fps scrolling on older/budget Android devices */
+.surah-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 76px;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.ayah-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 130px;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Glassmorphism utility for bottom nav */
+.nav-glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+.dark .nav-glass {
+  background: rgba(11, 20, 17, 0.8);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}

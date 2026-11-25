@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { Surah, RepeatMode, AyahTiming } from '@/types';
+import surahsData from '@/data/surahs.json';
 import { APP_CONFIG } from '@/config';
 import { savePlayHistory, getSurahHistory } from '@/services/db';
 import { downloadManager } from '@/services/downloader';
@@ -238,41 +239,62 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => clearInterval(interval);
   }, [isPlaying, currentSurah]);
 
-  // Setup Media Session API
+  // Setup Media Session API (Background playback & native notification controls)
   useEffect(() => {
     if (!('mediaSession' in navigator) || !currentSurah) return;
 
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: `${currentSurah.number}. ${currentSurah.englishName} (${currentSurah.malayalamName})`,
-      artist: APP_CONFIG.credits.reciter,
-      album: APP_CONFIG.appName,
-      artwork: [
-        { src: '/icons/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-        { src: '/icons/pwa-512x512.png', sizes: '512x512', type: 'image/png' }
-      ]
-    });
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: `${currentSurah.number}. ${currentSurah.englishName} (${currentSurah.malayalamName})`,
+        artist: `${APP_CONFIG.credits.reciter} • ${APP_CONFIG.credits.malayalamTranslation}`,
+        album: APP_CONFIG.appName,
+        artwork: [
+          { src: '/icons/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/icons/pwa-512x512.png', sizes: '512x512', type: 'image/png' }
+        ]
+      });
 
-    navigator.mediaSession.setActionHandler('play', () => resume());
-    navigator.mediaSession.setActionHandler('pause', () => pause());
-    navigator.mediaSession.setActionHandler('seekbackward', (details) => {
-      seekRelative(-(details.seekOffset || 15));
-    });
-    navigator.mediaSession.setActionHandler('seekforward', (details) => {
-      seekRelative(details.seekOffset || 15);
-    });
-    navigator.mediaSession.setActionHandler('seekto', (details) => {
-      if (details.seekTime !== undefined) {
-        seek(details.seekTime);
-      }
-    });
+      // Play & Pause
+      navigator.mediaSession.setActionHandler('play', () => resume());
+      navigator.mediaSession.setActionHandler('pause', () => pause());
+      navigator.mediaSession.setActionHandler('stop', () => pause());
+
+      // Track skipping (Prev / Next Surah in notification center & lockscreen)
+      navigator.mediaSession.setActionHandler('previoustrack', () => {
+        prevSurah(surahsData as Surah[]);
+      });
+      navigator.mediaSession.setActionHandler('nexttrack', () => {
+        nextSurah(surahsData as Surah[]);
+      });
+
+      // Seeking
+      navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+        seekRelative(-(details.seekOffset || 15));
+      });
+      navigator.mediaSession.setActionHandler('seekforward', (details) => {
+        seekRelative(details.seekOffset || 15);
+      });
+      navigator.mediaSession.setActionHandler('seekto', (details) => {
+        if (details.seekTime !== undefined) {
+          seek(details.seekTime);
+        }
+      });
+    } catch (e) {
+      console.warn('MediaSession handler registration notice:', e);
+    }
 
     return () => {
       if ('mediaSession' in navigator) {
-        navigator.mediaSession.setActionHandler('play', null);
-        navigator.mediaSession.setActionHandler('pause', null);
-        navigator.mediaSession.setActionHandler('seekbackward', null);
-        navigator.mediaSession.setActionHandler('seekforward', null);
-        navigator.mediaSession.setActionHandler('seekto', null);
+        try {
+          navigator.mediaSession.setActionHandler('play', null);
+          navigator.mediaSession.setActionHandler('pause', null);
+          navigator.mediaSession.setActionHandler('stop', null);
+          navigator.mediaSession.setActionHandler('previoustrack', null);
+          navigator.mediaSession.setActionHandler('nexttrack', null);
+          navigator.mediaSession.setActionHandler('seekbackward', null);
+          navigator.mediaSession.setActionHandler('seekforward', null);
+          navigator.mediaSession.setActionHandler('seekto', null);
+        } catch {}
       }
     };
   }, [currentSurah]);

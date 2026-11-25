@@ -46,18 +46,18 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 w-full bg-[#faf8f5]/95 dark:bg-[#0b1411]/95 backdrop-blur-lg border-t border-stone-200/80 dark:border-emerald-950/80 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 transition-colors shadow-lg">
-      <div className="max-w-2xl mx-auto grid grid-cols-5 gap-2 px-3">
+    <nav className="fixed bottom-0 left-0 right-0 z-30 w-full bg-white/75 dark:bg-[#0b1411]/80 backdrop-blur-xl border-t border-white/60 dark:border-white/10 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 transition-all shadow-[0_-8px_30px_rgb(0,0,0,0.08)] dark:shadow-[0_-8px_30px_rgb(0,0,0,0.35)]">
+      <div className="max-w-2xl mx-auto grid grid-cols-5 gap-1.5 px-3">
         {tabs.map(tab => {
           const isActive = currentTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => handleTabClick(tab.id)}
-              className={`flex flex-col items-center justify-center py-1 rounded-xl transition-all active:scale-95 ${
+              className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all duration-200 active:scale-95 ${
                 isActive
-                  ? 'text-emerald-700 dark:text-amber-400 font-bold scale-105'
-                  : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'
+                  ? 'bg-emerald-600/10 dark:bg-amber-400/15 text-emerald-800 dark:text-amber-300 font-bold border border-emerald-600/20 dark:border-amber-400/30 shadow-xs'
+                  : 'text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 hover:bg-black/5 dark:hover:bg-white/5 border border-transparent'
               }`}
             >
               <div className="mb-0.5">{tab.icon}</div>
