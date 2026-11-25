@@ -1000,7 +1000,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                 {[
                   { id: 'light', label: settings.language === 'ml' ? 'ലൈറ്റ്' : 'Light', icon: '☀️' },
                   { id: 'dark', label: settings.language === 'ml' ? 'മരതകം' : 'Emerald', icon: '🌙' },
-                  { id: 'sepia', label: settings.language === 'ml' ? 'സെപിയ' : 'Sepia', icon: '📜' },
+                  { id: 'sepia', label: settings.language === 'ml' ? 'നൈറ്റ് ഐ' : 'Night Eye', icon: '👁️' },
                   { id: 'midnight', label: 'AMOLED', icon: '🖤' },
                   { id: 'sapphire', label: 'Sapphire', icon: '🌌' },
                   { id: 'amethyst', label: 'Amethyst', icon: '🔮' },

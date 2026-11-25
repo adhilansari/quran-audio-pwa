@@ -67,9 +67,9 @@ export const Navbar: React.FC<NavbarProps> = () => {
     },
     {
       id: 'sepia',
-      labelMl: 'സെപിയ (വായന)',
-      labelEn: 'Sepia (Warm)',
-      icon: <span className="text-sm">📜</span>
+      labelMl: 'നൈറ്റ് ഐ (Night Eye)',
+      labelEn: 'Night Eye (Warm)',
+      icon: <span className="text-sm">👁️</span>
     },
     {
       id: 'midnight',
@@ -187,7 +187,7 @@ export const Navbar: React.FC<NavbarProps> = () => {
               {settings.theme === 'dark' ? (
                 <Moon className="w-4 h-4 text-emerald-400" />
               ) : settings.theme === 'sepia' ? (
-                <span className="text-xs">📜</span>
+                <span className="text-xs">👁️</span>
               ) : settings.theme === 'midnight' ? (
                 <span className="text-xs">🖤</span>
               ) : settings.theme === 'sapphire' ? (

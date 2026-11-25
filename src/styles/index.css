@@ -31,36 +31,65 @@
   line-height: 1.8;
 }
 
-/* Theme Styles: Sepia / Warm Reading Oasis */
+/* Theme Styles: Sepia / Night Eye Warm Reading Mode (Anti-Eye Strain) */
 html.sepia,
 html.sepia body {
-  background-color: #f7f2e7 !important;
-  color: #3b2a1a !important;
+  background-color: #19140f !important;
+  color: #faebd7 !important;
 }
 
 html.sepia .bg-white,
 html.sepia .dark\:bg-\[\#12201c\],
 html.sepia .bg-\[\#faf8f5\] {
-  background-color: #fffbf3 !important;
-  border-color: #e6dac6 !important;
-  color: #3b2a1a !important;
+  background-color: #241c15 !important;
+  border-color: #3e2e21 !important;
+  color: #faebd7 !important;
+}
+
+html.sepia .bg-stone-50,
+html.sepia .bg-stone-100,
+html.sepia .dark\:bg-emerald-950\/40,
+html.sepia .dark\:bg-emerald-950\/60,
+html.sepia .dark\:bg-emerald-950\/80 {
+  background-color: #1e1711 !important;
+  border-color: #3e2e21 !important;
 }
 
 html.sepia .text-stone-900,
-html.sepia .dark\:text-stone-100 {
-  color: #382413 !important;
+html.sepia .dark\:text-stone-100,
+html.sepia .text-stone-800 {
+  color: #fdf3e3 !important;
 }
 
 html.sepia .text-stone-600,
 html.sepia .dark\:text-stone-300,
-html.sepia .text-stone-500 {
-  color: #715842 !important;
+html.sepia .text-stone-500,
+html.sepia .dark\:text-stone-400 {
+  color: #cbb299 !important;
+}
+
+html.sepia .font-arabic {
+  color: #fde68a !important;
 }
 
 html.sepia header,
 html.sepia nav {
-  background-color: rgba(247, 242, 231, 0.96) !important;
-  border-color: #e6dac6 !important;
+  background-color: rgba(25, 20, 15, 0.88) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-color: #3e2e21 !important;
+}
+
+html.sepia .border-stone-200,
+html.sepia .dark\:border-emerald-950,
+html.sepia .dark\:border-emerald-900 {
+  border-color: #3e2e21 !important;
+}
+
+html.sepia .bg-emerald-800,
+html.sepia .bg-emerald-900 {
+  background-color: #3a2a1d !important;
+  color: #fbbf24 !important;
 }
 
 /* Theme Styles: Midnight AMOLED Pure Black */

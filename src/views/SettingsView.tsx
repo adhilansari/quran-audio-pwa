@@ -26,7 +26,7 @@ export const SettingsView: React.FC = () => {
     { id: 'system', label: t('themeSystem'), icon: <span className="text-xs">⚙️</span> },
     { id: 'light', label: t('themeLight'), icon: <Sun className="w-3.5 h-3.5 text-amber-500" /> },
     { id: 'dark', label: t('themeDark'), icon: <Moon className="w-3.5 h-3.5 text-emerald-400" /> },
-    { id: 'sepia', label: t('themeSepia'), icon: <span className="text-xs">📜</span> },
+    { id: 'sepia', label: t('themeSepia'), icon: <span className="text-xs">👁️</span> },
     { id: 'midnight', label: t('themeMidnight'), icon: <span className="text-xs">🖤</span> },
     { id: 'sapphire', label: t('themeSapphire'), icon: <span className="text-xs">🌌</span> },
     { id: 'amethyst', label: t('themeAmethyst'), icon: <span className="text-xs">🔮</span> },
