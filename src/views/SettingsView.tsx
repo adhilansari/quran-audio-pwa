@@ -101,16 +101,16 @@ export const SettingsView: React.FC = () => {
             <span>{t('arabicSize')}</span>
             <span className="font-bold text-emerald-700 dark:text-amber-400">
               {settings.arabicFontSize <= 24 ? (settings.language === 'ml' ? 'ചെറുത് (24px)' : 'Small (24px)') :
-               settings.arabicFontSize <= 28 ? (settings.language === 'ml' ? 'സാധാരണം (28px)' : 'Normal (28px)') :
+               settings.arabicFontSize <= 28 ? (settings.language === 'ml' ? 'സാധാരണ (28px)' : 'Normal (28px)') :
                settings.arabicFontSize <= 32 ? (settings.language === 'ml' ? 'ഇടത്തരം (32px)' : 'Medium (32px)') :
                settings.arabicFontSize <= 36 ? (settings.language === 'ml' ? 'വലുത് (36px)' : 'Large (36px)') :
-               (settings.language === 'ml' ? 'വളരെ വലുത് (42px)' : 'Huge (42px)')}
+               (settings.language === 'ml' ? 'കൂടുതൽ (42px)' : 'Huge (42px)')}
             </span>
           </div>
-          <div className="grid grid-cols-5 gap-1.5">
+          <div className="grid grid-cols-5 gap-1 sm:gap-1.5 w-full bg-stone-100/70 dark:bg-emerald-950/30 p-1 rounded-2xl border border-stone-200/60 dark:border-emerald-900/60">
             {[
               { size: 24, labelMl: 'ചെറുത്', labelEn: 'Small' },
-              { size: 28, labelMl: 'സാധാരണം', labelEn: 'Normal' },
+              { size: 28, labelMl: 'സാധാരണ', labelEn: 'Normal' },
               { size: 32, labelMl: 'ഇടത്തരം', labelEn: 'Medium' },
               { size: 36, labelMl: 'വലുത്', labelEn: 'Large' },
               { size: 42, labelMl: 'കൂടുതൽ', labelEn: 'Huge' }
@@ -121,11 +121,12 @@ export const SettingsView: React.FC = () => {
                   if ('vibrate' in navigator) navigator.vibrate(8);
                   updateSetting('arabicFontSize', opt.size);
                 }}
-                className={`py-2 px-1 rounded-xl text-center text-xs font-bold transition-all border ${
+                className={`min-w-0 w-full py-2 px-0.5 rounded-xl text-center text-[10.5px] sm:text-xs font-bold truncate transition-all border ${
                   settings.arabicFontSize === opt.size
-                    ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs scale-102'
-                    : 'bg-stone-50 dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-300 hover:bg-stone-100'
+                    ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-sm'
+                    : 'bg-white dark:bg-emerald-950/50 border-stone-200/80 dark:border-emerald-900/80 text-stone-700 dark:text-stone-300 hover:bg-stone-50'
                 }`}
+                title={settings.language === 'ml' ? opt.labelMl : opt.labelEn}
               >
                 {settings.language === 'ml' ? opt.labelMl : opt.labelEn}
               </button>
@@ -139,16 +140,16 @@ export const SettingsView: React.FC = () => {
             <span>{t('malayalamSize')}</span>
             <span className="font-bold text-emerald-700 dark:text-amber-400">
               {settings.malayalamFontSize <= 14 ? (settings.language === 'ml' ? 'ചെറുത് (14px)' : 'Small (14px)') :
-               settings.malayalamFontSize <= 16 ? (settings.language === 'ml' ? 'സാധാരണം (16px)' : 'Normal (16px)') :
+               settings.malayalamFontSize <= 16 ? (settings.language === 'ml' ? 'സാധാരണ (16px)' : 'Normal (16px)') :
                settings.malayalamFontSize <= 18 ? (settings.language === 'ml' ? 'ഇടത്തരം (18px)' : 'Medium (18px)') :
                settings.malayalamFontSize <= 20 ? (settings.language === 'ml' ? 'വലുത് (20px)' : 'Large (20px)') :
-               (settings.language === 'ml' ? 'വളരെ വലുത് (22px)' : 'Huge (22px)')}
+               (settings.language === 'ml' ? 'കൂടുതൽ (22px)' : 'Huge (22px)')}
             </span>
           </div>
-          <div className="grid grid-cols-5 gap-1.5">
+          <div className="grid grid-cols-5 gap-1 sm:gap-1.5 w-full bg-stone-100/70 dark:bg-emerald-950/30 p-1 rounded-2xl border border-stone-200/60 dark:border-emerald-900/60">
             {[
               { size: 14, labelMl: 'ചെറുത്', labelEn: 'Small' },
-              { size: 16, labelMl: 'സാധാരണം', labelEn: 'Normal' },
+              { size: 16, labelMl: 'സാധാരണ', labelEn: 'Normal' },
               { size: 18, labelMl: 'ഇടത്തരം', labelEn: 'Medium' },
               { size: 20, labelMl: 'വലുത്', labelEn: 'Large' },
               { size: 22, labelMl: 'കൂടുതൽ', labelEn: 'Huge' }
@@ -159,11 +160,12 @@ export const SettingsView: React.FC = () => {
                   if ('vibrate' in navigator) navigator.vibrate(8);
                   updateSetting('malayalamFontSize', opt.size);
                 }}
-                className={`py-2 px-1 rounded-xl text-center text-xs font-bold transition-all border ${
+                className={`min-w-0 w-full py-2 px-0.5 rounded-xl text-center text-[10.5px] sm:text-xs font-bold truncate transition-all border ${
                   settings.malayalamFontSize === opt.size
-                    ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs scale-102'
-                    : 'bg-stone-50 dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-300 hover:bg-stone-100'
+                    ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-sm'
+                    : 'bg-white dark:bg-emerald-950/50 border-stone-200/80 dark:border-emerald-900/80 text-stone-700 dark:text-stone-300 hover:bg-stone-50'
                 }`}
+                title={settings.language === 'ml' ? opt.labelMl : opt.labelEn}
               >
                 {settings.language === 'ml' ? opt.labelMl : opt.labelEn}
               </button>

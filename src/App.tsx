@@ -7,6 +7,7 @@ import { MiniPlayer } from '@/components/MiniPlayer';
 import { FullPlayer } from '@/components/FullPlayer';
 import { useAudio } from '@/contexts/AudioContext';
 import { downloadManager } from '@/services/downloader';
+import { preloadPopularSurahs } from '@/services/translationService';
 import { AlertCircle, X, Loader2 } from 'lucide-react';
 
 // Code-split / lazy load all views for optimal initial bundle & fast TTI
@@ -90,6 +91,7 @@ export const App: React.FC = () => {
 
   // Check URL on startup for deep links (e.g. ?surah=2&ayah=255) and hash tab (#surahs, etc.)
   useEffect(() => {
+    preloadPopularSurahs();
     const validTabs: NavTab[] = ['home', 'surahs', 'downloads', 'bookmarks', 'settings'];
     const hash = window.location.hash.replace('#', '') as NavTab;
     const initialTab: NavTab = validTabs.includes(hash) ? hash : 'home';

@@ -68,3 +68,33 @@ export async function loadSurahAyahs(surahId: number): Promise<Ayah[]> {
 
   return [];
 }
+
+/**
+ * Quietly pre-cache popular Surahs (Al-Fatihah, Al-Kahf, Yaseen, Al-Mulk, etc.)
+ * during browser idle time so they are permanently available offline.
+ */
+export function preloadPopularSurahs(): void {
+  if (typeof window === 'undefined') return;
+
+  const runPreload = async () => {
+    const popularSurahs = [1, 18, 36, 67, 112, 113, 114];
+    for (const id of popularSurahs) {
+      try {
+        const cached = await getCachedTranslation(id);
+        if (!cached || cached.length === 0) {
+          await loadSurahAyahs(id);
+          // Small pause between network requests
+          await new Promise(r => setTimeout(r, 800));
+        }
+      } catch (e) {
+        // Continue silently
+      }
+    }
+  };
+
+  if ('requestIdleCallback' in window) {
+    (window as any).requestIdleCallback(runPreload, { timeout: 10000 });
+  } else {
+    setTimeout(runPreload, 3000);
+  }
+}

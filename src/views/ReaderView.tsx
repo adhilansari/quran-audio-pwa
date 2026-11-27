@@ -414,8 +414,8 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
     }
   };
 
-  // Play individual Ayah audio recitation
-  const handlePlaySingleAyah = (ayah: Ayah) => {
+  // Play individual Ayah audio recitation with instant offline caching
+  const handlePlaySingleAyah = async (ayah: Ayah) => {
     if (playingAyahNum === ayah.ayah) {
       if (ayahAudioRef.current) {
         ayahAudioRef.current.pause();
@@ -430,16 +430,40 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
 
     const surahPadded = String(surah.number || surah.id).padStart(3, '0');
     const ayahPadded = String(ayah.ayah).padStart(3, '0');
-    const url = `https://everyayah.com/data/Alafasy_128kbps/${surahPadded}${ayahPadded}.mp3`;
+    const primaryUrl = `https://everyayah.com/data/Alafasy_128kbps/${surahPadded}${ayahPadded}.mp3`;
+    const fallbackUrl = ayah.globalAyahNumber
+      ? `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${ayah.globalAyahNumber}.mp3`
+      : null;
 
-    const audio = new Audio(url);
+    // Check CacheStorage for instant offline audio blob
+    let playUrl = primaryUrl;
+    try {
+      if (typeof caches !== 'undefined') {
+        const audioCache = await caches.open('quran-audio-v1');
+        const matched = (await audioCache.match(primaryUrl)) || (fallbackUrl ? await audioCache.match(fallbackUrl) : null);
+        if (matched) {
+          const blob = await matched.blob();
+          playUrl = URL.createObjectURL(blob);
+        } else {
+          // Auto-cache in background so once heard, it NEVER needs to fetch again
+          fetch(primaryUrl)
+            .then(res => {
+              if (res.ok) audioCache.put(primaryUrl, res);
+            })
+            .catch(() => {});
+        }
+      }
+    } catch (e) {
+      // Fallback to streaming directly
+    }
+
+    const audio = new Audio(playUrl);
     ayahAudioRef.current = audio;
     setPlayingAyahNum(ayah.ayah);
 
     audio.play().catch(e => {
       console.warn('Single ayah audio play error:', e);
-      if (ayah.globalAyahNumber) {
-        const fallbackUrl = `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${ayah.globalAyahNumber}.mp3`;
+      if (fallbackUrl) {
         const fbAudio = new Audio(fallbackUrl);
         ayahAudioRef.current = fbAudio;
         fbAudio.play().catch(() => setPlayingAyahNum(null));
@@ -1037,10 +1061,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                     {settings.arabicFontSize}px
                   </span>
                 </div>
-                <div className="grid grid-cols-5 gap-1">
+                <div className="grid grid-cols-5 gap-1 w-full">
                   {[
                     { label: settings.language === 'ml' ? 'ചെറുത്' : 'Small', val: 24 },
-                    { label: settings.language === 'ml' ? 'സാധാരണം' : 'Normal', val: 28 },
+                    { label: settings.language === 'ml' ? 'സാധാരണ' : 'Normal', val: 28 },
                     { label: settings.language === 'ml' ? 'ഇടത്തരം' : 'Medium', val: 32 },
                     { label: settings.language === 'ml' ? 'വലുത്' : 'Large', val: 36 },
                     { label: settings.language === 'ml' ? 'കൂടുതൽ' : 'Huge', val: 42 }
@@ -1052,10 +1076,11 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                         if ('vibrate' in navigator) navigator.vibrate(8);
                         updateSetting('arabicFontSize', size.val);
                       }}
-                      className={`py-1.5 px-0.5 rounded-lg text-center border font-bold text-[10px] transition-all active:scale-95 ${settings.arabicFontSize === size.val
+                      className={`min-w-0 w-full py-1.5 px-0.5 rounded-lg text-center border font-bold text-[10px] truncate transition-all active:scale-95 ${settings.arabicFontSize === size.val
                         ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs'
                         : 'bg-stone-50 dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100'
                         }`}
+                      title={size.label}
                     >
                       {size.label}
                     </button>
@@ -1073,10 +1098,10 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                     {settings.malayalamFontSize}px
                   </span>
                 </div>
-                <div className="grid grid-cols-5 gap-1">
+                <div className="grid grid-cols-5 gap-1 w-full">
                   {[
                     { label: settings.language === 'ml' ? 'ചെറുത്' : 'Small', val: 14 },
-                    { label: settings.language === 'ml' ? 'സാധാരണം' : 'Normal', val: 16 },
+                    { label: settings.language === 'ml' ? 'സാധാരണ' : 'Normal', val: 16 },
                     { label: settings.language === 'ml' ? 'ഇടത്തരം' : 'Medium', val: 18 },
                     { label: settings.language === 'ml' ? 'വലുത്' : 'Large', val: 20 },
                     { label: settings.language === 'ml' ? 'കൂടുതൽ' : 'Huge', val: 22 }
@@ -1088,10 +1113,11 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                         if ('vibrate' in navigator) navigator.vibrate(8);
                         updateSetting('malayalamFontSize', size.val);
                       }}
-                      className={`py-1.5 px-0.5 rounded-lg text-center border font-bold text-[10px] transition-all active:scale-95 ${settings.malayalamFontSize === size.val
+                      className={`min-w-0 w-full py-1.5 px-0.5 rounded-lg text-center border font-bold text-[10px] truncate transition-all active:scale-95 ${settings.malayalamFontSize === size.val
                         ? 'bg-emerald-800 text-amber-300 border-emerald-700 shadow-xs'
                         : 'bg-stone-50 dark:bg-emerald-950/40 border-stone-200 dark:border-emerald-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100'
                         }`}
+                      title={size.label}
                     >
                       {size.label}
                     </button>

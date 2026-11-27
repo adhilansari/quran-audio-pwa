@@ -32,9 +32,9 @@ const translations: Record<UILanguage, Record<string, string>> = {
   ml: {
     appName: "ഖുർആൻ മലയാളം ഓഡിയോ",
     home: "ഹോം",
-    surahs: "സൂറത്തുകൾ",
+    surahs: "സൂറകൾ",
     downloads: "ഡൗൺലോഡ്",
-    bookmarks: "ബുക്ക്മാർക്ക്",
+    bookmarks: "സേവ് ചെയ്തവ",
     settings: "സെറ്റിങ്സ്",
     searchPlaceholder: "സൂറത്ത് തിരയുക (മലയാളം, English, العربية)...",
     allSurahs: "എല്ലാ സൂറത്തുകളും",

@@ -16,9 +16,12 @@ const navigationRoute = new NavigationRoute(handler, {
 });
 registerRoute(navigationRoute);
 
-// 3. Cache translations, manifests, and JSON data with StaleWhileRevalidate
+// 3. Cache translations, scripture APIs, manifests, and JSON data with StaleWhileRevalidate
 registerRoute(
-  ({ url }) => url.pathname.includes('/data/') || url.pathname.endsWith('.json'),
+  ({ url }) =>
+    url.pathname.includes('/data/') ||
+    url.pathname.endsWith('.json') ||
+    url.hostname.includes('alquran.cloud'),
   new StaleWhileRevalidate({
     cacheName: 'quran-data-v1'
   })
@@ -93,13 +96,32 @@ async function handleAudioRequest(request: Request): Promise<Response> {
   // Not in cache: Attempt network fetch if online
   try {
     const networkResponse = await fetch(request);
+
+    // Auto-cache streamed audio (Surahs and Ayahs) so once heard, it NEVER needs network fetch again!
+    if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
+      const cacheCopy = networkResponse.clone();
+      audioCache.put(url, cacheCopy).catch(err => {
+        console.warn('[SW] Auto-caching audio failed:', err);
+      });
+    } else if (networkResponse && networkResponse.status === 206) {
+      // If server returned partial content (206) due to Range header, background-fetch full audio
+      // without Range header to permanently cache the complete file in CacheStorage
+      fetch(url)
+        .then(fullRes => {
+          if (fullRes.status === 200) {
+            return audioCache.put(url, fullRes);
+          }
+        })
+        .catch(() => {});
+    }
+
     return networkResponse;
   } catch (err) {
     // Offline and not cached
     return new Response(
       JSON.stringify({
         error: 'Offline',
-        message: 'This surah audio is not downloaded for offline listening. Connect to the internet or download it first.'
+        message: 'This audio is not yet cached or downloaded for offline listening. Connect to the internet once to play and auto-cache it.'
       }),
       {
         status: 503,
@@ -110,7 +132,7 @@ async function handleAudioRequest(request: Request): Promise<Response> {
   }
 }
 
-// 5. Intercept audio requests (Cloudflare R2, local mp3s, or any audio file)
+// 5. Intercept audio requests (Cloudflare R2, EveryAyah, IslamicNetwork, local mp3s, or any audio file)
 registerRoute(
   ({ request, url }) => {
     return (
@@ -118,6 +140,8 @@ registerRoute(
       url.pathname.endsWith('.mp3') ||
       url.pathname.includes('/audio/') ||
       url.hostname.includes('r2.dev') ||
+      url.hostname.includes('everyayah.com') ||
+      url.hostname.includes('islamic.network') ||
       url.pathname.includes('malayalam quran mp3')
     );
   },
