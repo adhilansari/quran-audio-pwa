@@ -996,18 +996,14 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                 <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                 <span>{settings.language === 'ml' ? 'തീം (Themes)' : 'Theme'}</span>
               </label>
-              <div className="grid grid-cols-3 gap-1.5">
+              <div className="grid grid-cols-4 gap-1.5">
                 {[
                   { id: 'light', label: settings.language === 'ml' ? 'ലൈറ്റ്' : 'Light', icon: '☀️' },
                   { id: 'dark', label: settings.language === 'ml' ? 'മരതകം' : 'Emerald', icon: '🌙' },
                   { id: 'sepia', label: settings.language === 'ml' ? 'നൈറ്റ് ഐ' : 'Night Eye', icon: '👁️' },
                   { id: 'midnight', label: 'AMOLED', icon: '🖤' },
                   { id: 'sapphire', label: 'Sapphire', icon: '🌌' },
-                  { id: 'amethyst', label: 'Amethyst', icon: '🔮' },
-                  { id: 'sage', label: 'Sage', icon: '🌿' },
-                  { id: 'rose', label: 'Rose', icon: '🌸' },
-                  { id: 'glassDark', label: 'Dark Glass', icon: '💎' },
-                  { id: 'glassLight', label: 'Crystal', icon: '🪟' },
+                  { id: 'glassDark', label: settings.language === 'ml' ? 'ഗ്ലാസ്' : 'Glass', icon: '💎' },
                   { id: 'system', label: settings.language === 'ml' ? 'സിസ്റ്റം' : 'Auto', icon: '⚙️' }
                 ].map((th) => (
                   <button

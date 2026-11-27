@@ -76,11 +76,7 @@ export type ThemeMode =
   | 'sepia'
   | 'midnight'
   | 'sapphire'
-  | 'amethyst'
-  | 'sage'
-  | 'rose'
-  | 'glassDark'
-  | 'glassLight';
+  | 'glassDark';
 export type UILanguage = 'ml' | 'en';
 export type RepeatMode = 'off' | 'surah' | 'all';
 

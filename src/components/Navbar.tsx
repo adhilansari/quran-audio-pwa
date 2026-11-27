@@ -56,7 +56,7 @@ export const Navbar: React.FC<NavbarProps> = () => {
     {
       id: 'light',
       labelMl: 'ലൈറ്റ് (ഇളം നിറം)',
-      labelEn: 'Light (Warm)',
+      labelEn: 'Minimal Light',
       icon: <Sun className="w-4 h-4 text-amber-500" />
     },
     {
@@ -80,38 +80,14 @@ export const Navbar: React.FC<NavbarProps> = () => {
     {
       id: 'sapphire',
       labelMl: 'സഫയർ (നീലരാവ്)',
-      labelEn: 'Sapphire (Navy)',
+      labelEn: 'Sapphire Night',
       icon: <span className="text-sm">🌌</span>
     },
     {
-      id: 'amethyst',
-      labelMl: 'അമത്വിസ്റ്റ് (റോയൽ)',
-      labelEn: 'Royal Velvet',
-      icon: <span className="text-sm">🔮</span>
-    },
-    {
-      id: 'sage',
-      labelMl: 'സേജ് (ഇളം പച്ച)',
-      labelEn: 'Sage Oasis',
-      icon: <span className="text-sm">🌿</span>
-    },
-    {
-      id: 'rose',
-      labelMl: 'റോസ് (മദീന പുലരി)',
-      labelEn: 'Madinah Rose',
-      icon: <span className="text-sm">🌸</span>
-    },
-    {
       id: 'glassDark',
-      labelMl: 'ഡാർക്ക് ഗ്ലാസ് (Aurora)',
-      labelEn: 'Dark Glass (Aurora)',
+      labelMl: 'ക്രിസ്റ്റൽ ഗ്ലാസ് (Glass)',
+      labelEn: 'Crystal Glass',
       icon: <span className="text-sm">💎</span>
-    },
-    {
-      id: 'glassLight',
-      labelMl: 'ക്രിസ്റ്റൽ ഗ്ലാസ് (Light)',
-      labelEn: 'Crystal Glass (Light)',
-      icon: <span className="text-sm">🪟</span>
     },
     {
       id: 'system',
@@ -192,16 +168,8 @@ export const Navbar: React.FC<NavbarProps> = () => {
                 <span className="text-xs">🖤</span>
               ) : settings.theme === 'sapphire' ? (
                 <span className="text-xs">🌌</span>
-              ) : settings.theme === 'amethyst' ? (
-                <span className="text-xs">🔮</span>
-              ) : settings.theme === 'sage' ? (
-                <span className="text-xs">🌿</span>
-              ) : settings.theme === 'rose' ? (
-                <span className="text-xs">🌸</span>
               ) : settings.theme === 'glassDark' ? (
                 <span className="text-xs">💎</span>
-              ) : settings.theme === 'glassLight' ? (
-                <span className="text-xs">🪟</span>
               ) : settings.theme === 'system' ? (
                 <span className="text-xs">⚙️</span>
               ) : (

@@ -7,6 +7,8 @@ interface SettingsContextType {
   updateSetting: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void;
   deferredInstallPrompt: any;
   isInstallable: boolean;
+  isIOS: boolean;
+  isStandalone: boolean;
   promptInstall: () => Promise<void>;
   t: (key: string) => string;
 }
@@ -31,9 +33,9 @@ const translations: Record<UILanguage, Record<string, string>> = {
     appName: "ഖുർആൻ മലയാളം ഓഡിയോ",
     home: "ഹോം",
     surahs: "സൂറത്തുകൾ",
-    downloads: "ഡൗൺലോഡുകൾ",
-    bookmarks: "ബുക്ക്മാർക്കുകൾ",
-    settings: "ക്രമീകരണങ്ങൾ",
+    downloads: "ഡൗൺലോഡ്",
+    bookmarks: "ബുക്ക്മാർക്ക്",
+    settings: "സെറ്റിങ്സ്",
     searchPlaceholder: "സൂറത്ത് തിരയുക (മലയാളം, English, العربية)...",
     allSurahs: "എല്ലാ സൂറത്തുകളും",
     offlineDownloaded: "ഡൗൺലോഡ് ചെയ്തവ",
@@ -56,17 +58,13 @@ const translations: Record<UILanguage, Record<string, string>> = {
     enablePersistence: "സംഭരണ സംരക്ഷണം ഉറപ്പാക്കുക",
     persistedActive: "സംഭരണ സംരക്ഷണം സജീവമാണ്",
     theme: "തീം (Appearance)",
-    themeSystem: "സിസ്റ്റം",
-    themeLight: "ലൈറ്റ് (Light)",
-    themeDark: "എമറാൾഡ് (Dark)",
+    themeSystem: "സിസ്റ്റം (System)",
+    themeLight: "ലൈറ്റ് (Minimal)",
+    themeDark: "മരതകം (Emerald)",
     themeSepia: "നൈറ്റ് ഐ (Night Eye)",
     themeMidnight: "മിഡ്നൈറ്റ് (AMOLED)",
-    themeSapphire: "സഫയർ (നീലരാവ്)",
-    themeAmethyst: "അമത്വിസ്റ്റ് (വെൽവെറ്റ്)",
-    themeSage: "സേജ് (ഇളം പച്ച)",
-    themeRose: "റോസ് (മദീന പുലരി)",
-    themeGlassDark: "ഡാർക്ക് ഗ്ലാസ് (Glassmorphism)",
-    themeGlassLight: "ക്രിസ്റ്റൽ ഗ്ലാസ് (Crystal Glass)",
+    themeSapphire: "സഫയർ (Sapphire)",
+    themeGlassDark: "ക്രിസ്റ്റൽ ഗ്ലാസ് (Glass)",
     builtBy: "നിർമ്മാണം (Developed by)",
     supportProject: "സഹായിക്കുക (Support)",
     portfolio: "പോർട്ട്ഫോളിയോ",
@@ -128,17 +126,13 @@ const translations: Record<UILanguage, Record<string, string>> = {
     enablePersistence: "Request Storage Persistence",
     persistedActive: "Storage Persistence Active",
     theme: "Theme",
-    themeSystem: "System",
-    themeLight: "Light",
+    themeSystem: "System (Auto)",
+    themeLight: "Minimal Light",
     themeDark: "Emerald Dark",
-    themeSepia: "Night Eye (Warm Sepia)",
+    themeSepia: "Night Eye (Warm)",
     themeMidnight: "Midnight (AMOLED)",
     themeSapphire: "Sapphire Night",
-    themeAmethyst: "Royal Amethyst",
-    themeSage: "Sage Oasis",
-    themeRose: "Madinah Rose",
-    themeGlassDark: "Dark Glass",
-    themeGlassLight: "Crystal Glass Light",
+    themeGlassDark: "Crystal Glass",
     builtBy: "Built by",
     supportProject: "Buy Me a Coffee",
     portfolio: "Portfolio",
@@ -179,6 +173,18 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [settings, setSettings] = useState<AppSettings>(defaultSettings);
   const [deferredInstallPrompt, setDeferredInstallPrompt] = useState<any>(null);
   const [isInstallable, setIsInstallable] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
+
+  // Detect iOS and Standalone PWA mode
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+      const standalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone === true;
+      setIsIOS(isIOSDevice);
+      setIsStandalone(standalone);
+    }
+  }, []);
 
   // Load settings on startup
   useEffect(() => {
@@ -187,6 +193,11 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const loaded: any = { ...defaultSettings };
       for (const k of keys) {
         loaded[k] = await getSetting(k, defaultSettings[k]);
+      }
+      // Safety check: if loaded theme was one of the removed themes, default to 'dark'
+      const validThemes: ThemeMode[] = ['system', 'light', 'dark', 'sepia', 'midnight', 'sapphire', 'glassDark'];
+      if (!validThemes.includes(loaded.theme)) {
+        loaded.theme = 'dark';
       }
       setSettings(loaded);
     }
@@ -201,20 +212,21 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       'sepia',
       'midnight',
       'sapphire',
-      'amethyst',
-      'sage',
-      'rose',
       'glassDark',
-      'glassLight',
       'light'
     );
 
     let activeTheme = settings.theme;
+    const validThemes: ThemeMode[] = ['system', 'light', 'dark', 'sepia', 'midnight', 'sapphire', 'glassDark'];
+    if (!validThemes.includes(activeTheme)) {
+      activeTheme = 'dark';
+    }
+
     if (activeTheme === 'system') {
       activeTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
 
-    const darkThemes = ['dark', 'midnight', 'sapphire', 'amethyst', 'glassDark'];
+    const darkThemes = ['dark', 'midnight', 'sapphire', 'glassDark', 'sepia'];
     if (darkThemes.includes(activeTheme)) {
       root.classList.add('dark', activeTheme);
     } else {
@@ -272,6 +284,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         updateSetting,
         deferredInstallPrompt,
         isInstallable,
+        isIOS,
+        isStandalone,
         promptInstall,
         t
       }}

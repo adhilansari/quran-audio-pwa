@@ -12,7 +12,9 @@ import {
   Heart,
   ExternalLink,
   Sparkles,
-  BookOpen
+  BookOpen,
+  Share,
+  Smartphone
 } from 'lucide-react';
 import { useSettings } from '@/contexts/SettingsContext';
 import { APP_CONFIG } from '@/config';
@@ -20,7 +22,7 @@ import { StorageManager } from '@/components/StorageManager';
 import { ThemeMode, UILanguage } from '@/types';
 
 export const SettingsView: React.FC = () => {
-  const { settings, updateSetting, isInstallable, promptInstall, t } = useSettings();
+  const { settings, updateSetting, isInstallable, isIOS, isStandalone, promptInstall, t } = useSettings();
 
   const themes: { id: ThemeMode; label: string; icon: React.ReactNode }[] = [
     { id: 'system', label: t('themeSystem'), icon: <span className="text-xs">⚙️</span> },
@@ -29,11 +31,7 @@ export const SettingsView: React.FC = () => {
     { id: 'sepia', label: t('themeSepia'), icon: <span className="text-xs">👁️</span> },
     { id: 'midnight', label: t('themeMidnight'), icon: <span className="text-xs">🖤</span> },
     { id: 'sapphire', label: t('themeSapphire'), icon: <span className="text-xs">🌌</span> },
-    { id: 'amethyst', label: t('themeAmethyst'), icon: <span className="text-xs">🔮</span> },
-    { id: 'sage', label: t('themeSage'), icon: <span className="text-xs">🌿</span> },
-    { id: 'rose', label: t('themeRose'), icon: <span className="text-xs">🌸</span> },
-    { id: 'glassDark', label: t('themeGlassDark'), icon: <span className="text-xs">💎</span> },
-    { id: 'glassLight', label: t('themeGlassLight'), icon: <span className="text-xs">🪟</span> }
+    { id: 'glassDark', label: t('themeGlassDark'), icon: <span className="text-xs">💎</span> }
   ];
 
   const languages: { id: UILanguage; label: string }[] = [
@@ -209,8 +207,49 @@ export const SettingsView: React.FC = () => {
       {/* 5. Storage Manager Card */}
       <StorageManager />
 
-      {/* 6. PWA Install */}
-      {isInstallable && (
+      {/* 6. PWA Install & iOS Add-to-Home-Screen Guidance */}
+      {isStandalone ? (
+        <div className="bg-emerald-900/40 border border-emerald-700/50 text-emerald-200 rounded-2xl p-3.5 flex items-center gap-3">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          <div className="text-xs">
+            <span className="font-bold text-emerald-300 block">{t('appInstalled')}</span>
+            <span>നേറ്റീവ് ആപ്പ് മോഡ് സജീവമാണ്. ഓഫ്‌ലൈൻ ഉപയോഗത്തിന് സജ്ജം.</span>
+          </div>
+        </div>
+      ) : isIOS ? (
+        <div className="bg-gradient-to-br from-stone-900 via-stone-800 to-emerald-950 text-white rounded-2xl p-4 shadow-md border border-amber-400/30 space-y-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-amber-400/20 text-amber-300 flex items-center justify-center shrink-0">
+              <Smartphone className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm text-amber-300">
+                {settings.language === 'ml' ? 'iPhone-ൽ നേറ്റീവ് ആപ്പായി മാറ്റാം' : 'Install on iPhone (Native Mode)'}
+              </h3>
+              <p className="text-[11px] text-stone-300">
+                {settings.language === 'ml' 
+                  ? 'താഴത്തെ വെബ്‌സൈറ്റ് ബാർ ഒഴിവാക്കി ഫുൾസ്ക്രീൻ ആപ്പാക്കാൻ:' 
+                  : 'To hide the Safari bottom bar & enjoy full-screen:'}
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-black/30 rounded-xl p-3 text-xs space-y-2 text-stone-200 border border-white/5">
+            <div className="flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-amber-400 text-stone-950 font-bold flex items-center justify-center text-[10px] shrink-0">1</span>
+              <span>Safari-ൽ താഴെയുള്ള <strong className="text-amber-300 font-semibold">Share</strong> (<Share className="w-3.5 h-3.5 inline mx-0.5 text-blue-400" />) ബട്ടൺ ടാപ്പ് ചെയ്യുക.</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-amber-400 text-stone-950 font-bold flex items-center justify-center text-[10px] shrink-0">2</span>
+              <span>താഴേക്ക് നീക്കി <strong className="text-white font-semibold">"Add to Home Screen"</strong> തിരഞ്ഞെടുക്കുക.</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-amber-400 text-stone-950 font-bold flex items-center justify-center text-[10px] shrink-0">3</span>
+              <span>മുകളിൽ വലതുവശത്ത് <strong className="text-emerald-400 font-semibold">"Add"</strong> അമർത്തുക. ആപ്പ് റെഡി!</span>
+            </div>
+          </div>
+        </div>
+      ) : isInstallable ? (
         <div className="bg-gradient-to-r from-emerald-800 to-emerald-900 text-white rounded-2xl p-4 shadow-md flex items-center justify-between">
           <div>
             <h3 className="font-bold text-sm text-amber-300">{t('installApp')}</h3>
@@ -225,7 +264,7 @@ export const SettingsView: React.FC = () => {
             Install
           </button>
         </div>
-      )}
+      ) : null}
 
       {/* 7. Developer & Support */}
       <div className="bg-gradient-to-br from-stone-50 via-white to-amber-50/50 dark:from-[#0d1714] dark:via-[#12201c] dark:to-[#172b25] rounded-2xl border border-stone-200 dark:border-emerald-950 p-4 shadow-sm space-y-3">

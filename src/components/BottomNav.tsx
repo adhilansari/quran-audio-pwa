@@ -61,7 +61,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               }`}
             >
               <div className="mb-0.5">{tab.icon}</div>
-              <span className="text-[10px] tracking-tight truncate max-w-[64px]">{tab.label}</span>
+              <span className="text-[10px] tracking-tight truncate w-full text-center px-0.5 leading-tight">{tab.label}</span>
             </button>
           );
         })}

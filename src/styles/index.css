@@ -144,69 +144,6 @@ html.sapphire nav {
   border-color: #1e293b !important;
 }
 
-/* Theme Styles: Mystic Amethyst / Royal Velvet */
-html.amethyst,
-html.amethyst body {
-  background-color: #0e0915 !important;
-  color: #f3e8ff !important;
-}
-
-html.amethyst .bg-white,
-html.amethyst .dark\:bg-\[\#12201c\],
-html.amethyst .bg-\[\#faf8f5\] {
-  background-color: #181024 !important;
-  border-color: #2e1a42 !important;
-  color: #f3e8ff !important;
-}
-
-html.amethyst header,
-html.amethyst nav {
-  background-color: rgba(14, 9, 21, 0.96) !important;
-  border-color: #2e1a42 !important;
-}
-
-/* Theme Styles: Olive Sage Oasis (Gentle Light) */
-html.sage,
-html.sage body {
-  background-color: #f3f7f4 !important;
-  color: #213326 !important;
-}
-
-html.sage .bg-white,
-html.sage .dark\:bg-\[\#12201c\],
-html.sage .bg-\[\#faf8f5\] {
-  background-color: #fbfdfb !important;
-  border-color: #cfe0d3 !important;
-  color: #213326 !important;
-}
-
-html.sage header,
-html.sage nav {
-  background-color: rgba(243, 247, 244, 0.96) !important;
-  border-color: #cfe0d3 !important;
-}
-
-/* Theme Styles: Rose Dawn / Madinah Sunrise (Soft Warm Light) */
-html.rose,
-html.rose body {
-  background-color: #fdf6f7 !important;
-  color: #3d2428 !important;
-}
-
-html.rose .bg-white,
-html.rose .dark\:bg-\[\#12201c\],
-html.rose .bg-\[\#faf8f5\] {
-  background-color: #fffbfa !important;
-  border-color: #edd5d8 !important;
-  color: #3d2428 !important;
-}
-
-html.rose header,
-html.rose nav {
-  background-color: rgba(253, 246, 247, 0.96) !important;
-  border-color: #edd5d8 !important;
-}
-
 /* Theme Styles: Dark Aurora Glassmorphism */
 html.glassDark,
 html.glassDark body {
@@ -232,33 +169,6 @@ html.glassDark nav {
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
   border-color: rgba(52, 211, 153, 0.18) !important;
-}
-
-/* Theme Styles: Crystal Frosted Light Glassmorphism */
-html.glassLight,
-html.glassLight body {
-  background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 45%, #fdf4ff 100%) !important;
-  background-attachment: fixed !important;
-  color: #0f172a !important;
-}
-
-html.glassLight .bg-white,
-html.glassLight .dark\:bg-\[\#12201c\],
-html.glassLight .bg-\[\#faf8f5\] {
-  background-color: rgba(255, 255, 255, 0.72) !important;
-  backdrop-filter: blur(24px) saturate(190%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
-  border-color: rgba(255, 255, 255, 0.85) !important;
-  box-shadow: 0 8px 30px 0 rgba(31, 38, 135, 0.08) !important;
-  color: #0f172a !important;
-}
-
-html.glassLight header,
-html.glassLight nav {
-  background-color: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border-color: rgba(226, 232, 240, 0.8) !important;
 }
 
 /* Islamic arabesque subtle geometric background */
