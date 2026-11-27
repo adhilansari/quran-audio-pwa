@@ -339,7 +339,16 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
     };
   }, [surah]);
 
-  // Auto-scroll loop with speed customization
+  // Auto-scroll loop with subpixel accumulator & smooth frame-rate independence
+  const autoScrollSpeedRef = useRef(autoScrollSpeed);
+  autoScrollSpeedRef.current = autoScrollSpeed;
+
+  const visibleCountRef = useRef(visibleCount);
+  visibleCountRef.current = visibleCount;
+
+  const ayahsLengthRef = useRef(ayahs.length);
+  ayahsLengthRef.current = ayahs.length;
+
   useEffect(() => {
     if (!isAutoScrolling) {
       if (animationFrameRef.current) {
@@ -350,24 +359,35 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
     }
 
     let lastTime = performance.now();
+    let scrollAccumulator = 0;
 
     const scrollStep = (now: number) => {
-      const delta = (now - lastTime) / 1000;
+      const delta = Math.min((now - lastTime) / 1000, 0.1); // clamp to 100ms
       lastTime = now;
 
-      // Base 30 pixels/second * multiplier (supports 0.1x, 0.2x, 0.5x, 1x, etc.)
-      const pixelsToScroll = Math.max(0.04, autoScrollSpeed * 30 * delta);
-      window.scrollBy(0, pixelsToScroll);
+      // Base speed: 40 pixels per second * speed multiplier (0.1x to 3.0x)
+      const speed = autoScrollSpeedRef.current;
+      scrollAccumulator += speed * 40 * delta;
 
-      // Expand visibleCount progressively before hitting bottom
-      const scrollBottom = window.innerHeight + window.scrollY;
-      const docHeight = document.documentElement.scrollHeight;
-      if (docHeight - scrollBottom < 500 && visibleCount < ayahs.length) {
-        setVisibleCount(prev => Math.min(ayahs.length, prev + 25));
+      if (scrollAccumulator >= 1) {
+        const pxToScroll = Math.floor(scrollAccumulator);
+        window.scrollBy({ top: pxToScroll, behavior: 'auto' });
+        scrollAccumulator -= pxToScroll;
       }
 
-      // Check if reached very bottom of chapter
-      if (docHeight - scrollBottom <= 2 && visibleCount >= ayahs.length) {
+      // Progressively expand visibleCount as user scrolls down
+      const scrollBottom = window.innerHeight + window.scrollY;
+      const docHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+      if (docHeight - scrollBottom < 600 && visibleCountRef.current < ayahsLengthRef.current) {
+        setVisibleCount(prev => Math.min(ayahsLengthRef.current, prev + 25));
+      }
+
+      // Check if reached very bottom of chapter (only if actually scrollable and at the bottom)
+      const isAtBottom = docHeight - scrollBottom <= 4;
+      const isFullyLoaded = visibleCountRef.current >= ayahsLengthRef.current;
+      const hasScrolled = window.scrollY > 50;
+
+      if (isAtBottom && isFullyLoaded && hasScrolled) {
         setIsAutoScrolling(false);
         if (settings.autoPlayNext && surah.id < 114) {
           const allSurahs = surahsData as Surah[];
@@ -394,7 +414,7 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
         animationFrameRef.current = null;
       }
     };
-  }, [isAutoScrolling, autoScrollSpeed, visibleCount, ayahs.length]);
+  }, [isAutoScrolling]);
 
   const toggleBookmark = async (ayahNum: number) => {
     const isSaved = bookmarkedMap[ayahNum];
@@ -586,7 +606,20 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
         <div className="flex items-center gap-1.5">
           {/* Auto-Scroll Toggle */}
           <button
-            onClick={() => setIsAutoScrolling(!isAutoScrolling)}
+            onClick={() => {
+              if ('vibrate' in navigator) navigator.vibrate(8);
+              setIsAutoScrolling(prev => {
+                const nextState = !prev;
+                if (nextState) {
+                  const docHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+                  const scrollBottom = window.innerHeight + window.scrollY;
+                  if (docHeight - scrollBottom <= 10 && window.scrollY > 100) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }
+                return nextState;
+              });
+            }}
             className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all ${isAutoScrolling
               ? 'bg-amber-400 text-emerald-950 border-amber-300 font-bold shadow-xs'
               : 'border-stone-200 dark:border-emerald-900 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-emerald-950'
@@ -978,7 +1011,17 @@ export const ReaderView: React.FC<ReaderViewProps> = ({
                   <span>{settings.language === 'ml' ? 'ഓട്ടോ സ്ക്രോൾ' : 'Auto-Scroll'}</span>
                 </span>
                 <button
-                  onClick={() => setIsAutoScrolling(!isAutoScrolling)}
+                  onClick={() => {
+                    if (Date.now() - openTimestampRef.current < 250) return;
+                    if ('vibrate' in navigator) navigator.vibrate(8);
+                    setIsAutoScrolling(prev => {
+                      const next = !prev;
+                      if (next) {
+                        setIsAssistiveOpen(false); // Close sheet so user can view scrolling text immediately!
+                      }
+                      return next;
+                    });
+                  }}
                   className={`px-3 py-1 rounded-xl font-bold text-xs flex items-center gap-1 transition-all ${isAutoScrolling
                     ? 'bg-amber-400 text-emerald-950 shadow-xs'
                     : 'bg-emerald-800 text-amber-300'
